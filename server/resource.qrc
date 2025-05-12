@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resource/默认头像框.png</file>
+        <file>resource/Server.jpg</file>
+    </qresource>
+</RCC>
