@@ -65,7 +65,7 @@ public:
 public slots:
     void handleIncomingPeerRichTextMessage(const Packege& resend_Pkg);
     void handleIncomingPeerFileMessage(const Packege& resend_Pkg);
-    void requestLocalChatHistory(const QString& peerUser);
+    void loadLocalChatHistory(const QString& peerUser);
     void handleServerChatHistoryResp(const Packege& resend_Pkg);
     void handleDownloadRequest(const QString &fileID);
     void handleOpenFolder(const QString &fileID);

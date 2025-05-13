@@ -89,7 +89,9 @@ void FriendDetailWidget::receiveFriendInfo(const QString &account)
 {
     // 处理接收到的 account 信息
     Account_Message user_Info = localBase->userProfile_Table_Load_localAccountInfo(account);
-    avatarLabel->setPixmap(user_Info.avatar_Path);
+    QPixmap pixmap(user_Info.avatar_Path);
+    pixmap = pixmap.scaled(avatarLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation); // 保持比例缩放，适应标签大小
+    avatarLabel->setPixmap(pixmap);
     nicknameLabel->setText("昵称: "+user_Info.nickname);
     qqNumberLabel->setText("QQ: "+account);
 }

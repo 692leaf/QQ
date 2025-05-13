@@ -22,5 +22,5 @@ target_link_libraries(LocalDatabase PUBLIC
 # 设置包含目录（供其他模块使用）
 target_include_directories(LocalDatabase PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}  # 添加根目录路径
+    ${CMAKE_SOURCE_DIR}/client  # 添加根目录路径
 )

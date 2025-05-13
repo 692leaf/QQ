@@ -384,14 +384,16 @@ void LocalDatabase::local_ChrTable_Create_ChatRecord(const Packege &chatSyncPkg)
 
 QString LocalDatabase::local_ChrTable_Load_TipMessage(const QString &peerUser)
 {
+    QString localUser = qApp->property("username").toString();
     QSqlQuery query(db);
     query.prepare(QString("SELECT * FROM local_chatlist WHERE "
-                          "(sender=:peerUser AND receiver_del=0) "
-                          "OR (receiver=:peerUser AND sender_del=0)"
+                          "(sender=:peerUser AND receiver=:localUser AND receiver_del=0) "
+                          "OR (receiver=:peerUser AND sender=:localUser AND sender_del=0)"
                           "ORDER BY send_time DESC LIMIT 1"));
 
     // 使用命名绑定防止SQL注入
     query.bindValue(":peerUser",peerUser);
+    query.bindValue(":localUser",localUser);
 
     if (!query.exec())
     {
@@ -431,15 +433,17 @@ QString LocalDatabase::local_ChrTable_Load_TipMessage(const QString &peerUser)
 
 QVector<Packege> LocalDatabase::local_ChrTable_Load_ChatHistory(const QString &peerUser)
 {
+    QString localUser = qApp->property("username").toString();
     // 接收方消息同步
     QVector<Packege> chatHistory_Pkgs;
     QSqlQuery query(db);
     query.prepare(QString("SELECT * FROM local_chatlist WHERE "
-                          "(sender=:peerUser AND receiver_del=0) "
-                          "OR (receiver=:peerUser AND sender_del=0)"));
+                          "(sender=:peerUser AND receiver=:localUser AND receiver_del=0) "
+                          "OR (receiver=:peerUser AND sender=:localUser AND sender_del=0)"));
 
     // 使用命名绑定防止SQL注入
     query.bindValue(":peerUser",peerUser);
+    query.bindValue(":localUser",localUser);
 
 
     if (!query.exec())

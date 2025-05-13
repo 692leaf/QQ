@@ -105,8 +105,8 @@ void SpecificChatWindow::OpenChatWidget(const QString &user)
     sLayout->addWidget(splitter);
     userChatSplitters[user] = splitter;
 
-    // 请求聊天历史
-    requestLocalChatHistory(user);
+    // 加载聊天历史
+    loadLocalChatHistory(user);
 }
 
 QWidget *SpecificChatWindow::inputWindow()
@@ -821,7 +821,7 @@ void SpecificChatWindow::handleIncomingPeerFileMessage(const Packege& resend_Pkg
     processFilePackage(resend_Pkg);
 }
 
-void SpecificChatWindow::requestLocalChatHistory(const QString& peerUser)
+void SpecificChatWindow::loadLocalChatHistory(const QString& peerUser)
 {
     QVector<Packege> chatHistory_Pkgs=localBase->local_ChrTable_Load_ChatHistory(peerUser);
     for(auto chatHistory_Pkg:chatHistory_Pkgs)

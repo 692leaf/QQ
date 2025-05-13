@@ -12,4 +12,6 @@ target_link_libraries(Common INTERFACE
 )
 
 # 设置包含目录（供上层使用）
-target_include_directories(Common INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(Common INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)

@@ -81,7 +81,7 @@ void TcpClient::heartbeatTimeCheck(const Packege& resend_Pkg)
 
 void TcpClient::serverConnect()
 {
-    QString ip="192.168.43.144";
+    QString ip="127.0.0.1";
     QString port="6000";
     socket->connectToHost(QHostAddress(ip),port.toUShort());
 }
