@@ -14,20 +14,21 @@ class AddFriendOrGroupDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit AddFriendOrGroupDialog(QWidget *parent = nullptr,TcpClient* client=nullptr);
+    explicit AddFriendOrGroupDialog(QWidget *parent = nullptr, TcpClient *client = nullptr);
     ~AddFriendOrGroupDialog();
     void initUi();
 private slots:
-    void onSearchTextChanged(const QString& text);
-    void handleSearchPageDataResponse(const Packege& resend_Pkg);
-    void onAddButtonClicked(const QModelIndex& index);
+    void onSearchTextChanged(const QString &text);
+    void handleSearchPageDataResponse(const Packege &resend_Pkg);
+    void onAddButtonClicked(const QModelIndex &index);
+
 private:
-    TcpClient* client;
-    QListView* listView;
-    QStandardItemModel* model;
-    ButtonDelegate* delegate;
+    TcpClient *client;
+    QListView *listView;
+    QStandardItemModel *model;
+    ButtonDelegate *delegate;
 signals:
-    void onAddNewFriendButtonClickded(const Account_Message& user_Info);
+    void onAddNewFriendButtonClickded(const Account_Message &user_Info);
 };
 
 #endif // ADDFRIENDORGROUPDIALOG_H

@@ -23,13 +23,14 @@ void AudioSender::startBroadcast()
 {
     // 配置音频参数
     QAudioFormat format;
-    format.setSampleRate(16000);      // 16kHz采样率
-    format.setChannelCount(1);        // 单声道
+    format.setSampleRate(16000);                 // 16kHz采样率
+    format.setChannelCount(1);                   // 单声道
     format.setSampleFormat(QAudioFormat::UInt8); // 8位无符号
 
     // 获取音频设备
     QAudioDevice inputDevice = QMediaDevices::defaultAudioInput();
-    if (!inputDevice.isFormatSupported(format)) {
+    if (!inputDevice.isFormatSupported(format))
+    {
         qWarning() << "Format not supported, using preferred format";
         format = inputDevice.preferredFormat();
     }
@@ -45,7 +46,8 @@ void AudioSender::startBroadcast()
 
 void AudioSender::stopBroadcast()
 {
-    if (audioSource) {
+    if (audioSource)
+    {
         audioSource->stop();
         delete audioSource;
         audioSource = nullptr;
@@ -57,7 +59,7 @@ void AudioSender::handleAudioDataReady()
 {
     // 读取音频数据并发送
     QByteArray audioData = audioDevice->readAll();
-    if(!audioData.isEmpty())
+    if (!audioData.isEmpty())
     {
         udpSocket->writeDatagram(audioData, QHostAddress(targetIp), targetPort);
     }

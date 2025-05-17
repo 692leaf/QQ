@@ -27,13 +27,15 @@ ServerManager::ServerManager(QObject *parent)
 }
 
 ServerManager::~ServerManager()
-{}
+{
+}
 
 bool ServerManager::init()
 {
     dbManager = new DatabaseManager(this);
-    server = new TcpServer(this,dbManager);
-    if (!server->init()) {
+    server = new TcpServer(this, dbManager);
+    if (!server->init())
+    {
         qCritical() << "TCP 服务器初始化失败";
         // 清理已经分配的资源
         cleanup();
@@ -51,11 +53,8 @@ void ServerManager::cleanup()
     dbManager = nullptr;
 }
 
-
 void ServerManager::onQuitRequested()
 {
     serverTray->hide();
     QApplication::quit();
 }
-
-

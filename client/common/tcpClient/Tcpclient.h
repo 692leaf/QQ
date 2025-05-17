@@ -16,24 +16,25 @@ public:
 
     void initHeartBeat(int intervalMs);
     void heartbeatSent();
-    void heartbeatTimeCheck(const Packege& reheart_Pkg);
+    void heartbeatTimeCheck(const Packege &reheart_Pkg);
 public slots:
     void serverConnect();
     void readMessage();
-    bool sendMessage(const Packege& sender_Pkg);
-    void processPackage(Packege& resend_Pkg);
-    //连接成功或失败
+    bool sendMessage(const Packege &sender_Pkg);
+    void processPackage(Packege &resend_Pkg);
+    // 连接成功或失败
     void onConnected();
     void onConnectionError();
+
 private:
-    QTimer* heartbeatTimer;
-    QTimer* timeoutTimer;
+    QTimer *heartbeatTimer;
+    QTimer *timeoutTimer;
     int intervalMs;
-    QTcpSocket* socket;
+    QTcpSocket *socket;
     QByteArray socketBuffer; // 接收缓冲区
 signals:
     void heartbeatTimeout();
-    void messageReceived(const Packege& resender_Pkg);
+    void messageReceived(const Packege &resender_Pkg);
 };
 
 #endif // TCPCLIENT_H

@@ -20,9 +20,9 @@ private slots:
     void handleAudioDataReady();
 
 private:
-    QUdpSocket* udpSocket;
-    QAudioSource* audioSource = nullptr;
-    QIODevice* audioDevice = nullptr;
+    QUdpSocket *udpSocket;
+    QAudioSource *audioSource = nullptr;
+    QIODevice *audioDevice = nullptr;
     QString targetIp;
     quint16 targetPort;
 };

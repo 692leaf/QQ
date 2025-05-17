@@ -1,14 +1,15 @@
 #include "ButtonDelegate.h"
 
-ButtonDelegate::ButtonDelegate(QObject *parent,bool isJoinButton)
-    :QStyledItemDelegate(parent),
-    isJoinButton(isJoinButton)
-{}
+ButtonDelegate::ButtonDelegate(QObject *parent, bool isJoinButton)
+    : QStyledItemDelegate(parent),
+      isJoinButton(isJoinButton)
+{
+}
 
 QSize ButtonDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    //重写 sizeHint 函数，自定义项的大小
-    return QSize(option.rect.width(),60); // 头像高度40px + 上下边距
+    // 重写 sizeHint 函数，自定义项的大小
+    return QSize(option.rect.width(), 60); // 头像高度40px + 上下边距
 }
 
 void ButtonDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -31,9 +32,9 @@ void ButtonDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
     }
 
     // 布局参数
-    const int padding = 8;          // 内边距
-    const int avatarSize = 40;      // 头像大小
-    const int textSpacing = 4;      // 文字间距
+    const int padding = 8;     // 内边距
+    const int avatarSize = 40; // 头像大小
+    const int textSpacing = 4; // 文字间距
 
     // 绘制头像
     QRect avatarRect = option.rect.adjusted(padding, padding, 0, -padding);
@@ -62,10 +63,9 @@ void ButtonDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
     QRect qqRect = textRect.adjusted(0, 20, 0, 0); // 向下偏移20px
     painter->drawText(qqRect, Qt::AlignLeft | Qt::AlignTop, "QQ: " + qqNumber);
 
-
     // 绘制按钮
     QRect buttonRect = option.rect;
-    buttonRect.setLeft(buttonRect.right() - 80);  // 按钮宽度80px
+    buttonRect.setLeft(buttonRect.right() - 80); // 按钮宽度80px
     buttonRect.setWidth(60);
     buttonRect.setHeight(24);
     buttonRect.moveTop(option.rect.center().y() - 12); // 垂直居中
@@ -85,9 +85,11 @@ void ButtonDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
     painter->restore();
 }
 
-bool ButtonDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) {
-    if (event->type() == QEvent::MouseButtonRelease) {
-        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+bool ButtonDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
+{
+    if (event->type() == QEvent::MouseButtonRelease)
+    {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
         QRect buttonRect = option.rect;
         buttonRect.setLeft(buttonRect.right() - 80);
         buttonRect.setWidth(60);
@@ -95,11 +97,13 @@ bool ButtonDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const
         buttonRect.moveTop(option.rect.center().y() - 12);
 
         // 检查按钮是否启用
-        if (buttonEnabledStates.contains(index) && !buttonEnabledStates[index]) {
+        if (buttonEnabledStates.contains(index) && !buttonEnabledStates[index])
+        {
             return false;
         }
 
-        if (buttonRect.contains(mouseEvent->pos())) {
+        if (buttonRect.contains(mouseEvent->pos()))
+        {
             emit buttonClicked(index);
             return true;
         }
@@ -109,19 +113,19 @@ bool ButtonDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const
 
 void ButtonDelegate::setButtonText(const QModelIndex &index, const QString &text)
 {
-    buttonTexts[index]=text;
+    buttonTexts[index] = text;
 }
 
-QString ButtonDelegate::getButtonText(const QModelIndex& index) const
+QString ButtonDelegate::getButtonText(const QModelIndex &index) const
 {
-    if(buttonTexts.contains(index))
+    if (buttonTexts.contains(index))
     {
         return buttonTexts.value(index);
     }
-    return isJoinButton?"添加":"同意";
+    return isJoinButton ? "添加" : "同意";
 }
 
-void ButtonDelegate::setButtonEnabled(const QModelIndex &index,bool enabled)
+void ButtonDelegate::setButtonEnabled(const QModelIndex &index, bool enabled)
 {
-    buttonEnabledStates[index]=enabled;
+    buttonEnabledStates[index] = enabled;
 }

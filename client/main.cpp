@@ -10,20 +10,20 @@
 int WinMain(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    TcpClient* client = new TcpClient;
-    LocalDatabase* localBase = new LocalDatabase;
+    TcpClient *client = new TcpClient;
+    LocalDatabase *localBase = new LocalDatabase;
     client->initHeartBeat(30);
-    //登录
+    // 登录
     {
-        LoginDialog d(nullptr,client,localBase);
-        if(d.exec()==QDialog::Rejected)
+        LoginDialog d(nullptr, client, localBase);
+        if (d.exec() == QDialog::Rejected)
         {
             return 0;
         }
     }
 
-    //登录成功进入主界面
-    MainPage w(nullptr,client,localBase);
+    // 登录成功进入主界面
+    MainPage w(nullptr, client, localBase);
     w.show();
     return a.exec();
 }

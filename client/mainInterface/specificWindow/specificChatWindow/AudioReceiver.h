@@ -22,9 +22,9 @@ private slots:
     void handleDatagrams();
 
 private:
-    QUdpSocket* udpSocket;
-    QAudioSink* audioSink = nullptr;
-    QIODevice* audioDevice = nullptr;
+    QUdpSocket *udpSocket;
+    QAudioSink *audioSink = nullptr;
+    QIODevice *audioDevice = nullptr;
     quint16 localListenPort = 0;
 };
 

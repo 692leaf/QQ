@@ -1,92 +1,79 @@
-QPushButton#closeBtn
-{
-    border:none;
-    background-image:url(:/resource/image/close.png);
-    width:32px;
-    height:32px;
+QPushButton#closeBtn {
+    border: none;
+    background-image: url(:/resource/image/close.png);
+    width: 32px;
+    height: 32px;
 }
 
-QPushButton#closeBtn:hover
-{
-    background-image:url(:/resource/image/closeHover.png);
+QPushButton#closeBtn:hover {
+    background-image: url(:/resource/image/closeHover.png);
 }
 
-QLineEdit
-{
-    border:none;
-    border-bottom:1px solid rgb(223,223,233);
-    height:40px;
-    font-size:12pt;
+QLineEdit {
+    border: none;
+    border-bottom: 1px solid rgb(223, 223, 233);
+    height: 40px;
+    font-size: 12pt;
 }
 
-QLineEdit:hover
-{
-    border-bottom:1px solid rgb(127,127,127);
+QLineEdit:hover {
+    border-bottom: 1px solid rgb(127, 127, 127);
 }
 
-QCheckBox
-{
-    color:rgb(127,127,127);
+QCheckBox {
+    color: rgb(127, 127, 127);
 }
 
-QCheckBox:hover
-{
-    color:rgb(100,100,100);
+QCheckBox:hover {
+    color: rgb(100, 100, 100);
 }
 
-QPushButton#toReg
-{
-    border:none;
-    color:rgb(127,127,127);
+QPushButton#toReg {
+    border: none;
+    color: rgb(127, 127, 127);
 }
 
-QPushButton#toReg:hover
-{
-    color:rgb(100,100,100);
+QPushButton#toReg:hover {
+    color: rgb(100, 100, 100);
 }
 
-QPushButton#logging
-{
-    height:30px;
-    border:none;
-    border-radius:5px;
-    background:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 rgb(11,194,255),stop: 1.0 rgb(0,182,250));
-    font-size:12pt;
-    color:white;
+QPushButton#logging {
+    height: 30px;
+    border: none;
+    border-radius: 5px;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(11, 194, 255), stop: 1.0 rgb(0, 182, 250));
+    font-size: 12pt;
+    color: white;
 }
 
-QPushButton#logging:hover
-{
-    background:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 rgb(34,203,255),stop: 1.0 rgb(26,194,251));
+QPushButton#logging:hover {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(34, 203, 255), stop: 1.0 rgb(26, 194, 251));
 }
 
-QPushButton#m_Reg,QPushButton#m_ToLog
-{
-    border:none;
-    height:30px;
-    font-size:12pt;
-    color:white;
-}
-QPushButton#m_Reg
-{
-    width:120px;
-    background-color:rgb(217,31,31);
-    border-top-left-radius:5px;
+QPushButton#m_Reg,
+QPushButton#m_ToLog {
+    border: none;
+    height: 30px;
+    font-size: 12pt;
+    color: white;
 }
 
-QPushButton#m_Reg:hover
-{
-    background-color:rgb(229,74,74);
+QPushButton#m_Reg {
+    width: 120px;
+    background-color: rgb(217, 31, 31);
+    border-top-left-radius: 5px;
 }
 
-QPushButton#m_ToLog
-{
-    background-color:rgb(39,178,239);
-    border-bottom-right-radius:5px;
+QPushButton#m_Reg:hover {
+    background-color: rgb(229, 74, 74);
+}
+
+QPushButton#m_ToLog {
+    background-color: rgb(39, 178, 239);
+    border-bottom-right-radius: 5px;
 }
 
 
-QPushButton#m_ToLog:hover
-{
-    background-color:rgb(26,194,251);
+QPushButton#m_ToLog:hover {
+    background-color: rgb(26, 194, 251);
 }

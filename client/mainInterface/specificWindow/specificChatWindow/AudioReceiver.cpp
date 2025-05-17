@@ -49,7 +49,7 @@ void AudioReceiver::startListening()
     audioDevice = audioSink->start();
 
     // 连接数据接收信号
-    connect(udpSocket, &QUdpSocket::readyRead,this, &AudioReceiver::handleDatagrams);
+    connect(udpSocket, &QUdpSocket::readyRead, this, &AudioReceiver::handleDatagrams);
 }
 
 void AudioReceiver::stopListening()

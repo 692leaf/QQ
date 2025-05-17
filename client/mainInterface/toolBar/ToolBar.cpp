@@ -12,97 +12,91 @@
 #include <QUuid>
 #include <QStandardPaths>
 
-ToolBar::ToolBar(QWidget *parent,TcpClient* client,LocalDatabase* localBase)
+ToolBar::ToolBar(QWidget *parent, TcpClient *client, LocalDatabase *localBase)
     : QWidget{parent},
-    client(client),
-    localBase(localBase)
+      client(client),
+      localBase(localBase)
 {
     initUi();
 }
 
 void ToolBar::initUi()
 {
-    tBar=new QToolBar(this);
-    QAction* avatarAction = setUserAvatarBar();
-    QAction* chatAction = setChatMessageBar();
-    QAction* friendListAction = setFriendListBar();
+    tBar = new QToolBar(this);
+    QAction *avatarAction = setUserAvatarBar();
+    QAction *chatAction = setChatMessageBar();
+    QAction *friendListAction = setFriendListBar();
 
-    //添加操作
+    // 添加操作
     tBar->addAction(avatarAction);
     tBar->addAction(chatAction);
     tBar->addAction(friendListAction);
 
-    //在左侧停靠
+    // 在左侧停靠
     tBar->setAllowedAreas(Qt::LeftToolBarArea);
-    //垂直摆放
+    // 垂直摆放
     tBar->setOrientation(Qt::Vertical);
 
-    //点击头像，弹出图片对话框
-    connect(avatarAction,&QAction::triggered,[this](){
+    // 点击头像，弹出图片对话框
+    connect(avatarAction, &QAction::triggered, [this]()
+            {
         //获取用户信息(异步性，数据返回后，创建对话框)
-        load_Local_Account_Message();
-    });
+        load_Local_Account_Message(); });
 
-    //发送信号给mainPage
-    connect(chatAction,&QAction::triggered,[this](){
-        emit switchSecondPageRequested(CHATLIST_PAGE);
-    });
+    // 发送信号给mainPage
+    connect(chatAction, &QAction::triggered, [this]()
+            { emit switchSecondPageRequested(CHATLIST_PAGE); });
 
-    connect(friendListAction,&QAction::triggered,[this](){
-        emit switchSecondPageRequested(FRIENDLIST_PAGE);
-    });
-
+    connect(friendListAction, &QAction::triggered, [this]()
+            { emit switchSecondPageRequested(FRIENDLIST_PAGE); });
 }
 
-
-QAction* ToolBar::setUserAvatarBar()
+QAction *ToolBar::setUserAvatarBar()
 {
-    QAction* avatarAction = new QAction(this);
+    QAction *avatarAction = new QAction(this);
     avatarAction->setIcon(QIcon(":/resource/image/contacts.png"));
     avatarAction->setToolTip("图片");
     return avatarAction;
 }
 
-QAction* ToolBar::setChatMessageBar()
+QAction *ToolBar::setChatMessageBar()
 {
-    QAction* chatAction = new QAction(this);
+    QAction *chatAction = new QAction(this);
     chatAction->setIcon(QIcon(":/resource/image/chat.png"));
     chatAction->setToolTip("消息");
     return chatAction;
 }
 
-QAction* ToolBar::setFriendListBar()
+QAction *ToolBar::setFriendListBar()
 {
-    QAction* friendListAction = new QAction(this);
+    QAction *friendListAction = new QAction(this);
     friendListAction->setIcon(QIcon(":/resource/image/contacts.png"));
     friendListAction->setToolTip("联系人");
     return friendListAction;
 }
 
-
 void ToolBar::avatarDialog()
 {
     dlog = new QDialog(this);
     dlog->setWindowTitle("查看个人信息");
-    dlog->setFixedSize(200,150);
+    dlog->setFixedSize(200, 150);
 
     //============================= 布局设置 =============================
 
     // 创建主布局：对话框整体垂直布局
-    QVBoxLayout* mainVerticalLayout = new QVBoxLayout(dlog);
+    QVBoxLayout *mainVerticalLayout = new QVBoxLayout(dlog);
 
     // 头部布局：包含头像和用户信息的水平布局
-    QHBoxLayout* headerHorizontalLayout = new QHBoxLayout;
+    QHBoxLayout *headerHorizontalLayout = new QHBoxLayout;
 
     // 信息布局：用户ID和昵称的垂直布局
-    QVBoxLayout* infoVerticalLayout = new QVBoxLayout;
-    QLabel* nameLabel=new QLabel(displayNickname,dlog);
-    QLabel* idLabel=new QLabel("QQ "+qqNumber,dlog);
+    QVBoxLayout *infoVerticalLayout = new QVBoxLayout;
+    QLabel *nameLabel = new QLabel(displayNickname, dlog);
+    QLabel *idLabel = new QLabel("QQ " + qqNumber, dlog);
     infoVerticalLayout->addWidget(nameLabel);
     infoVerticalLayout->addWidget(idLabel);
 
-
-    QLabel* avatarLabel = new QLabel;
+    QLabel *avatarLabel = new QLabel;
     // 加载图片并设置到标签
     QPixmap image(avatar_Path);
     if (image.isNull())
@@ -114,15 +108,12 @@ void ToolBar::avatarDialog()
     headerHorizontalLayout->addWidget(avatarLabel);
     headerHorizontalLayout->addLayout(infoVerticalLayout);
 
-
-
     // 操作布局：按钮区域的水平布局
-    QHBoxLayout* actionHorizontalLayout = new QHBoxLayout;
-    QPushButton* editButton = new QPushButton("编辑资料",dlog);
-    QPushButton* sendMessageButton = new QPushButton("发消息",dlog);
+    QHBoxLayout *actionHorizontalLayout = new QHBoxLayout;
+    QPushButton *editButton = new QPushButton("编辑资料", dlog);
+    QPushButton *sendMessageButton = new QPushButton("发消息", dlog);
     actionHorizontalLayout->addWidget(editButton);
     actionHorizontalLayout->addWidget(sendMessageButton);
-
 
     mainVerticalLayout->addLayout(headerHorizontalLayout); // 先添加头部布局
     mainVerticalLayout->addLayout(actionHorizontalLayout); // 再添加操作布局
@@ -144,9 +135,8 @@ void ToolBar::avatarDialog()
     avatarLabel->setPixmap(scaledImage);
     avatarLabel->setFixedSize(side, side);
 
-    connect(editButton,&QPushButton::clicked,this,&ToolBar::editDialog);
+    connect(editButton, &QPushButton::clicked, this, &ToolBar::editDialog);
     dlog->show();
-
 
     // 标签，签名等，，，待添加
 }
@@ -158,27 +148,26 @@ void ToolBar::editDialog()
     editDlog = new QDialog(this);
     editDlog->setWindowTitle("编辑资料");
 
-    QVBoxLayout* vLayout=new QVBoxLayout(editDlog);
+    QVBoxLayout *vLayout = new QVBoxLayout(editDlog);
 
     // 创建控件
-    QPushButton* selectAvatarBtn = new QPushButton(QIcon(avatar_Path),"选择图片",editDlog);
-    QLabel* nicknameLabel = new QLabel("昵称",editDlog);
-    QLineEdit* nicknameEdit = new QLineEdit(editDlog);
-    QLabel* nicknameCountLabel = new QLabel("0/36",editDlog);//创建字符计数标签
-    QPushButton* saveButton = new QPushButton("保存",editDlog);
-    QPushButton* cancelButton = new QPushButton("取消",editDlog);
+    QPushButton *selectAvatarBtn = new QPushButton(QIcon(avatar_Path), "选择图片", editDlog);
+    QLabel *nicknameLabel = new QLabel("昵称", editDlog);
+    QLineEdit *nicknameEdit = new QLineEdit(editDlog);
+    QLabel *nicknameCountLabel = new QLabel("0/36", editDlog); // 创建字符计数标签
+    QPushButton *saveButton = new QPushButton("保存", editDlog);
+    QPushButton *cancelButton = new QPushButton("取消", editDlog);
 
     // 创建水平布局放置昵称标签和输入框
-    QHBoxLayout* nicknameLayout = new QHBoxLayout(editDlog);
+    QHBoxLayout *nicknameLayout = new QHBoxLayout(editDlog);
     nicknameLayout->addWidget(nicknameLabel);
     nicknameLayout->addWidget(nicknameEdit);
     nicknameLayout->addWidget(nicknameCountLabel);
 
     // 创建水平布局放置昵称保存和取消按钮
-    QHBoxLayout* buttonLayout = new QHBoxLayout(editDlog);
+    QHBoxLayout *buttonLayout = new QHBoxLayout(editDlog);
     buttonLayout->addWidget(saveButton);
     buttonLayout->addWidget(cancelButton);
-
 
     // 总体垂直布局
     vLayout->addWidget(selectAvatarBtn);
@@ -188,7 +177,8 @@ void ToolBar::editDialog()
     editDlog->setLayout(vLayout);
 
     // 图片设置
-    connect(selectAvatarBtn,&QPushButton::clicked,[this](){
+    connect(selectAvatarBtn, &QPushButton::clicked, [this]()
+            {
         // ================================= 图片路径默认使用上一次的 ====================================
 
         // 获取图片路径
@@ -201,21 +191,21 @@ void ToolBar::editDialog()
         else
         {
             qDebug()<<"未选择图片";
-        }
-    });
+        } });
 
     // 文本设置
-    connect(nicknameEdit,&QLineEdit::textChanged,[nicknameEdit,nicknameCountLabel](const QString& text){
+    connect(nicknameEdit, &QLineEdit::textChanged, [nicknameEdit, nicknameCountLabel](const QString &text)
+            {
         int length=text.length();
         nicknameCountLabel->setText(QString::number(length)+"/36");
         // 判断长度是否超过36，如果超过则恢复到之前的文本（即不允许继续输入）
         if (length > 36)
         {
             nicknameEdit->setText(nicknameEdit->text().left(36));
-        }
-    });
+        } });
 
-    connect(saveButton,&QPushButton::clicked,[this,nicknameEdit,saveButton](){
+    connect(saveButton, &QPushButton::clicked, [this, nicknameEdit, saveButton]()
+            {
         if (isLocalDataUpdatePending)
         {
             qDebug() << "请求已发送，请等待响应";
@@ -246,11 +236,10 @@ void ToolBar::editDialog()
             editDlog->accept();
         }
 
-        isLocalDataUpdatePending = false;
-    });
+        isLocalDataUpdatePending = false; });
 
     // 点击叉号退出窗口
-    connect(cancelButton,&QPushButton::clicked,editDlog,&QDialog::reject);
+    connect(cancelButton, &QPushButton::clicked, editDlog, &QDialog::reject);
     // exec使得主线程被阻塞,信号无法接收,改成show
     editDlog->show();
 }
@@ -258,19 +247,18 @@ void ToolBar::editDialog()
 // ========================= 本地数据库加载数据，获取本地账户数据 ======================
 void ToolBar::load_Local_Account_Message()
 {
-    QString account=qApp->property("username").toString();
-    Account_Message user_Info=localBase->userProfile_Table_Load_localAccountInfo(account);
+    QString account = qApp->property("username").toString();
+    Account_Message user_Info = localBase->userProfile_Table_Load_localAccountInfo(account);
 
     qqNumber = account;
     displayNickname = user_Info.nickname;
     avatar_Path = user_Info.avatar_Path;
 
-    //创建对话框
+    // 创建对话框
     avatarDialog();
 }
 
-
-void ToolBar::getImageBinaryDataByPath(const QString &localPath,Account_Message& user_Info)
+void ToolBar::getImageBinaryDataByPath(const QString &localPath, Account_Message &user_Info)
 {
     QFileInfo imageInfo(localPath);
 
@@ -289,6 +277,3 @@ void ToolBar::getImageBinaryDataByPath(const QString &localPath,Account_Message&
         user_Info.avatarData.clear(); // 清空无效数据
     }
 }
-
-
-

@@ -1,8 +1,8 @@
 #include "Frienddetailwidget.h"
 
-FriendDetailWidget::FriendDetailWidget(QWidget *parent,LocalDatabase* localBase)
+FriendDetailWidget::FriendDetailWidget(QWidget *parent, LocalDatabase *localBase)
     : QWidget{parent},
-    localBase(localBase)
+      localBase(localBase)
 {
     // 创建主垂直布局
     QVBoxLayout *mainVerticalLayout = new QVBoxLayout;
@@ -17,14 +17,14 @@ FriendDetailWidget::FriendDetailWidget(QWidget *parent,LocalDatabase* localBase)
     // 创建备注、签名和 QQ 空间标签
     remarkLabel = new QLabel("备注: 鲁迅");
     signatureLabel = new QLabel("签名: 这是美好的一天");
-    qqSpaceLabel = new QLabel("<a href='https://www.baidu.com'>进入 QQ 空间</a>", nullptr); //user.qzone.qq.com/123456
+    qqSpaceLabel = new QLabel("<a href='https://www.baidu.com'>进入 QQ 空间</a>", nullptr); // user.qzone.qq.com/123456
     qqSpaceLabel->setTextFormat(Qt::RichText);
     qqSpaceLabel->setOpenExternalLinks(true);
 
     // 设置昵称,QQ号,备注,签名和qq空间标签的字体
     QFont font;
-    font.setPointSize(14);  // 设置字体大小为14磅
-    font.setFamily("Arial");  // 设置字体为Arial，你可以根据需要修改
+    font.setPointSize(14);   // 设置字体大小为14磅
+    font.setFamily("Arial"); // 设置字体为Arial，你可以根据需要修改
     nicknameLabel->setFont(font);
     qqNumberLabel->setFont(font);
     remarkLabel->setFont(font);
@@ -48,14 +48,14 @@ FriendDetailWidget::FriendDetailWidget(QWidget *parent,LocalDatabase* localBase)
     avatarInfoHorizontalLayout->addWidget(avatarLabel);
     avatarInfoHorizontalLayout->addLayout(nicknameQQNumberVerticalLayout);
 
-    QVBoxLayout* centralVerticalLayout = new QVBoxLayout;
+    QVBoxLayout *centralVerticalLayout = new QVBoxLayout;
     centralVerticalLayout->addLayout(avatarInfoHorizontalLayout);
     centralVerticalLayout->addWidget(remarkLabel);
     centralVerticalLayout->addWidget(signatureLabel);
     centralVerticalLayout->addWidget(qqSpaceLabel);
 
     // 创建新的水平布局用于在右侧添加间距
-    QHBoxLayout* leftSpacedLayout = new QHBoxLayout;
+    QHBoxLayout *leftSpacedLayout = new QHBoxLayout;
     QSpacerItem *leftMarginSpacer = new QSpacerItem(10, 20, QSizePolicy::Maximum, QSizePolicy::Minimum);
     QSpacerItem *rightMarginSpacer = new QSpacerItem(10, 20, QSizePolicy::Maximum, QSizePolicy::Minimum);
     leftSpacedLayout->addSpacerItem(leftMarginSpacer);
@@ -63,7 +63,7 @@ FriendDetailWidget::FriendDetailWidget(QWidget *parent,LocalDatabase* localBase)
     leftSpacedLayout->addSpacerItem(rightMarginSpacer);
 
     // 创建水平布局用于放置操作按钮
-    QHBoxLayout* operationButtonsHorizontalLayout = new QHBoxLayout;
+    QHBoxLayout *operationButtonsHorizontalLayout = new QHBoxLayout;
 
     // 在按钮左侧添加弹簧
     QSpacerItem *leftButtonSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -92,6 +92,6 @@ void FriendDetailWidget::receiveFriendInfo(const QString &account)
     QPixmap pixmap(user_Info.avatar_Path);
     pixmap = pixmap.scaled(avatarLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation); // 保持比例缩放，适应标签大小
     avatarLabel->setPixmap(pixmap);
-    nicknameLabel->setText("昵称: "+user_Info.nickname);
-    qqNumberLabel->setText("QQ: "+account);
+    nicknameLabel->setText("昵称: " + user_Info.nickname);
+    qqNumberLabel->setText("QQ: " + account);
 }

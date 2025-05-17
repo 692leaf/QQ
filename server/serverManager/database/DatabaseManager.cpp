@@ -12,48 +12,53 @@
 DatabaseManager::DatabaseManager(QObject *parent)
     : QObject{parent}
 {
-    //连接数据库
-    db=QSqlDatabase::addDatabase("QMYSQL");
+    // 连接数据库
+    db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
     db.setPort(3306);
     db.setDatabaseName("newdatabase");
     db.setUserName("root");
     db.setPassword("root");
-    //尝试打开数据库
-    if(!db.open())
+    // 尝试打开数据库
+    if (!db.open())
     {
-        qDebug()<<"Failed to connect to the database:"<<db.lastError();
+        qDebug() << "Failed to connect to the database:" << db.lastError();
     }
 
-    //创建user表
-    QSqlQuery query(db);  // 指定数据库连接
+    // 创建user表
+    QSqlQuery query(db); // 指定数据库连接
     QString createUserTableQuery = "CREATE TABLE IF NOT EXISTS users ("
-                               "id INT AUTO_INCREMENT PRIMARY KEY, "
-                               "account VARCHAR(255),"
-                               "password VARCHAR(255),"
-                               "nickname VARCHAR(255),"
-                               "ipv4 VARCHAR(20),"
-                               "online TINYINT(1),"
-                               "avatar_path VARCHAR(255),"
-                               "version VARCHAR(255)"
-                               ")";
-    if (query.exec(createUserTableQuery)) {
+                                   "id INT AUTO_INCREMENT PRIMARY KEY, "
+                                   "account VARCHAR(255),"
+                                   "password VARCHAR(255),"
+                                   "nickname VARCHAR(255),"
+                                   "ipv4 VARCHAR(20),"
+                                   "online TINYINT(1),"
+                                   "avatar_path VARCHAR(255),"
+                                   "version VARCHAR(255)"
+                                   ")";
+    if (query.exec(createUserTableQuery))
+    {
         qDebug() << "Table(users) created successfully.";
-    } else {
+    }
+    else
+    {
         qDebug() << "Error creating table(users): " << query.lastError().text();
     }
 
-
-    //创建friendlist表
+    // 创建friendlist表
     QString createFrdTableQuery = "CREATE TABLE IF NOT EXISTS friendlist ("
-                               "id INT AUTO_INCREMENT PRIMARY KEY,"
-                               "user VARCHAR(255), "
-                               "friend VARCHAR(255),"
-                               "request TINYINT(1),"
-                                "answer TINYINT(1))";
-    if (query.exec(createFrdTableQuery)) {
+                                  "id INT AUTO_INCREMENT PRIMARY KEY,"
+                                  "user VARCHAR(255), "
+                                  "friend VARCHAR(255),"
+                                  "request TINYINT(1),"
+                                  "answer TINYINT(1))";
+    if (query.exec(createFrdTableQuery))
+    {
         qDebug() << "Table(friendlist) created successfully.";
-    } else {
+    }
+    else
+    {
         qDebug() << "Error creating table(friendlist): " << query.lastError().text();
     }
 
@@ -68,53 +73,65 @@ DatabaseManager::DatabaseManager(QObject *parent)
                                   "is_synced TINYINT(1),"
                                   "send_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
                                   ")";
-    if (query.exec(createChrTableQuery)) {
+    if (query.exec(createChrTableQuery))
+    {
         qDebug() << "Table(chatlist) created successfully.";
-    } else {
+    }
+    else
+    {
         qDebug() << "Error creating table(chatlist): " << query.lastError().text();
     }
 
     /*保存消息(文本，文件)的两个次表(具体内容)*/
-    //创建texts_transfers表
+    // 创建texts_transfers表
     QString createTextsTableQuery = "CREATE TABLE IF NOT EXISTS texts_transfers ("
-                               "id INT AUTO_INCREMENT PRIMARY KEY,"
-                               "chatlist_id INT,"
-                               "content TEXT,"
-                               "FOREIGN KEY (chatlist_id) REFERENCES chatlist(id)"
-                               "ON DELETE CASCADE ON UPDATE CASCADE"
-                                  ")";
-    if (query.exec(createTextsTableQuery)) {
+                                    "id INT AUTO_INCREMENT PRIMARY KEY,"
+                                    "chatlist_id INT,"
+                                    "content TEXT,"
+                                    "FOREIGN KEY (chatlist_id) REFERENCES chatlist(id)"
+                                    "ON DELETE CASCADE ON UPDATE CASCADE"
+                                    ")";
+    if (query.exec(createTextsTableQuery))
+    {
         qDebug() << "Table(texts_transfers) created successfully.";
-    } else {
+    }
+    else
+    {
         qDebug() << "Error creating table(texts_transfers): " << query.lastError().text();
     }
 
-    //创建file_transfers表
-    QString createFilesTableQuery  = "CREATE TABLE IF NOT EXISTS file_transfers ("
-                          "id INT AUTO_INCREMENT PRIMARY KEY,"
-                          "chatlist_id INT,"
-                          "file_path TEXT,"
-                          "file_name TEXT,"
-                          "FOREIGN KEY (chatlist_id) REFERENCES chatlist(id)"
-                          "ON DELETE CASCADE ON UPDATE CASCADE"
-                          ")";
-    if (query.exec(createFilesTableQuery)) {
+    // 创建file_transfers表
+    QString createFilesTableQuery = "CREATE TABLE IF NOT EXISTS file_transfers ("
+                                    "id INT AUTO_INCREMENT PRIMARY KEY,"
+                                    "chatlist_id INT,"
+                                    "file_path TEXT,"
+                                    "file_name TEXT,"
+                                    "FOREIGN KEY (chatlist_id) REFERENCES chatlist(id)"
+                                    "ON DELETE CASCADE ON UPDATE CASCADE"
+                                    ")";
+    if (query.exec(createFilesTableQuery))
+    {
         qDebug() << "Table(file_transfers) created successfully.";
-    } else {
+    }
+    else
+    {
         qDebug() << "Error creating table(file_transfers): " << query.lastError().text();
     }
 
     /*音频独立出来，作为媒体库*/
-    //创建media_transfers表
+    // 创建media_transfers表
     QString createMediaTableQuery = "CREATE TABLE IF NOT EXISTS media_transfers ("
                                     "id INT AUTO_INCREMENT PRIMARY KEY,"
                                     "account VARCHAR(255),"
                                     "media_path TEXT,"
                                     "media_name TEXT"
                                     ")";
-    if (query.exec(createMediaTableQuery)) {
+    if (query.exec(createMediaTableQuery))
+    {
         qDebug() << "Table(media_transfers) created successfully.";
-    } else {
+    }
+    else
+    {
         qDebug() << "Error creating table(media_transfers): " << query.lastError().text();
     }
 }
@@ -136,23 +153,23 @@ DatabaseManager::~DatabaseManager()
 void DatabaseManager::available_Drivers()
 {
     QStringList drivers = QSqlDatabase::drivers();
-    qInfo()<<drivers;
+    qInfo() << drivers;
 }
 
-QString DatabaseManager::userTable_Create_AccountRecord(const Packege& send_Pkg)
+QString DatabaseManager::userTable_Create_AccountRecord(const Packege &send_Pkg)
 {
-    //插入数据
+    // 插入数据
     QSqlQuery query(db);
-    QString insertQuery ="INSERT INTO users (account, password,avatar_path,version) "
+    QString insertQuery = "INSERT INTO users (account, password,avatar_path,version) "
                           "VALUES (:account, :password, :avatar_path, :version)";
     query.prepare(insertQuery);
-    query.bindValue(":account",send_Pkg.sender);
-    query.bindValue(":password",send_Pkg.sender_Passwd);
-    query.bindValue(":avatar_path",":/resource/默认头像框.png"); // 默认路径
-    QString uuid=QUuid::createUuid().toString(QUuid::WithoutBraces); // 随机生成版本号
-    query.bindValue(":version",uuid);
+    query.bindValue(":account", send_Pkg.sender);
+    query.bindValue(":password", send_Pkg.sender_Passwd);
+    query.bindValue(":avatar_path", ":/resource/默认头像框.png");      // 默认路径
+    QString uuid = QUuid::createUuid().toString(QUuid::WithoutBraces); // 随机生成版本号
+    query.bindValue(":version", uuid);
 
-    if(query.exec())
+    if (query.exec())
     {
         qDebug() << "Data inserted successfully.";
     }
@@ -164,16 +181,16 @@ QString DatabaseManager::userTable_Create_AccountRecord(const Packege& send_Pkg)
     return uuid;
 }
 
-bool DatabaseManager::userTable_Read_UserLogin(const QString& condition)
+bool DatabaseManager::userTable_Read_UserLogin(const QString &condition)
 {
     QSqlQuery query(db);
     query.prepare(QString("SELECT * FROM users WHERE %1").arg(condition));
-    if(query.exec())
+    if (query.exec())
     {
         if (query.next())
         {
             // 如果能移动到下一条记录，说明有符合条件的记录，返回 true
-            userTable_Update_OnlineStatus(query.value("account").toString(),true);
+            userTable_Update_OnlineStatus(query.value("account").toString(), true);
             return true;
         }
     }
@@ -183,9 +200,9 @@ bool DatabaseManager::userTable_Read_UserLogin(const QString& condition)
 bool DatabaseManager::userTable_Read_AccountExists(const QString &account)
 {
     QSqlQuery query(db);
-    QString condition=QString("account = '%1'").arg(account);
+    QString condition = QString("account = '%1'").arg(account);
     query.prepare(QString("SELECT * FROM users WHERE %1").arg(condition));
-    if(query.exec())
+    if (query.exec())
     {
         if (query.next())
         {
@@ -196,21 +213,21 @@ bool DatabaseManager::userTable_Read_AccountExists(const QString &account)
     return false;
 }
 
-QVector<Account_Message> DatabaseManager::userTable_Read_AccountMessage(const QString& part)
+QVector<Account_Message> DatabaseManager::userTable_Read_AccountMessage(const QString &part)
 {
     QVector<Account_Message> search_Page_Data;
     QSqlQuery query(db);
-    if(part=="")// 当 part 为空时，查询前 6 条记录
+    if (part == "") // 当 part 为空时，查询前 6 条记录
     {
         query.prepare("SELECT * FROM users LIMIT 6");
     }
-    else// 使用 LIKE 操作符进行部分匹配
+    else // 使用 LIKE 操作符进行部分匹配
     {
         QString condition = QString("account LIKE '%%1%'").arg(part);
         query.prepare(QString("SELECT * FROM users WHERE %1").arg(condition));
     }
 
-    if(query.exec())
+    if (query.exec())
     {
         while (query.next())
         {
@@ -234,11 +251,11 @@ Account_Message DatabaseManager::userTable_Read_UserMessage(const QString &accou
     QSqlQuery query(db);
     QString condition = QString("SELECT * FROM users WHERE account=:account");
     query.prepare(condition);
-    query.bindValue(":account",account);
+    query.bindValue(":account", account);
 
-    if(query.exec())
+    if (query.exec())
     {
-        if(query.next())
+        if (query.next())
         {
             user_Info.account = account;
             user_Info.nickname = query.value("nickname").toString();
@@ -248,7 +265,7 @@ Account_Message DatabaseManager::userTable_Read_UserMessage(const QString &accou
         }
         else
         {
-            qDebug()<<"未找到匹配的记录";
+            qDebug() << "未找到匹配的记录";
         }
     }
     else
@@ -261,20 +278,20 @@ Account_Message DatabaseManager::userTable_Read_UserMessage(const QString &accou
 QString DatabaseManager::userTable_Read_IPv4(const QString &account)
 {
     QSqlQuery query(db);
-    QString condition=QString("SELECT ipv4 FROM users WHERE account=:account");
-    //准备SQL语句
+    QString condition = QString("SELECT ipv4 FROM users WHERE account=:account");
+    // 准备SQL语句
     query.prepare(condition);
-    query.bindValue(":account",account);
+    query.bindValue(":account", account);
 
-    if(query.exec())
+    if (query.exec())
     {
-        if(query.next())
+        if (query.next())
         {
             return query.value("ipv4").toString();
         }
         else
         {
-            qDebug()<<"未找到匹配的记录";
+            qDebug() << "未找到匹配的记录";
         }
     }
     else
@@ -284,21 +301,21 @@ QString DatabaseManager::userTable_Read_IPv4(const QString &account)
     return "";
 }
 
-void DatabaseManager::userTable_Update_IPv4(const QString& sender,const QString& ipAddress)
+void DatabaseManager::userTable_Update_IPv4(const QString &sender, const QString &ipAddress)
 {
     QSqlQuery query(db);
     query.prepare(QString("UPDATE users SET ipv4=:ipv4 WHERE account=:account"));
-    query.bindValue(":account",sender);
-    query.bindValue(":ipv4",ipAddress);
+    query.bindValue(":account", sender);
+    query.bindValue(":ipv4", ipAddress);
 
-    if(!query.exec())
+    if (!query.exec())
     {
-        qDebug()<<"IPv4 Update failed";
+        qDebug() << "IPv4 Update failed";
         return;
     }
 }
 
-void DatabaseManager::userTable_Update_Account_Info(const Packege& send_Pkg)
+void DatabaseManager::userTable_Update_Account_Info(const Packege &send_Pkg)
 {
     /*==================================将图片保存到本地==================================*/
 
@@ -322,22 +339,21 @@ void DatabaseManager::userTable_Update_Account_Info(const Packege& send_Pkg)
 
     Account_Message user_Info = send_Pkg.user_Info;
     // 构建完整图片路径
-    QString uuid=QUuid::createUuid().toString(QUuid::WithoutBraces);
-    QString imageType=user_Info.imageType;
-    QString imagePath = dirPath + "/" + uuid + "." + imageType;  // 注意文件扩展名前的点
+    QString uuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    QString imageType = user_Info.imageType;
+    QString imagePath = dirPath + "/" + uuid + "." + imageType; // 注意文件扩展名前的点
     QFile image(imagePath);
-    if(image.open(QIODevice::WriteOnly))
+    if (image.open(QIODevice::WriteOnly))
     {
         image.write(user_Info.avatarData);
         image.close();
-        qDebug()<<"图片保存成功";
+        qDebug() << "图片保存成功";
     }
     else
     {
-        qDebug()<<"无法打开图片进行写入:"<<image.errorString();
+        qDebug() << "无法打开图片进行写入:" << image.errorString();
         return;
     }
-
 
     QSqlQuery query(db);
     query.prepare(QString("UPDATE users SET "
@@ -350,10 +366,10 @@ void DatabaseManager::userTable_Update_Account_Info(const Packege& send_Pkg)
     query.bindValue(":avatar_path", imagePath);
     query.bindValue(":version", user_Info.version);
 
-    if(!query.exec())
+    if (!query.exec())
     {
-        //更新出错
-        qDebug()<<"user_Info Update failed!";
+        // 更新出错
+        qDebug() << "user_Info Update failed!";
         return;
     }
 }
@@ -362,16 +378,15 @@ void DatabaseManager::userTable_Update_OnlineStatus(const QString &account, bool
 {
     QSqlQuery query(db);
     query.prepare(QString("UPDATE users SET online=:online WHERE account=:account"));
-    query.bindValue(":account",account);
-    query.bindValue(":online",isOnline);
+    query.bindValue(":account", account);
+    query.bindValue(":online", isOnline);
 
-    if(!query.exec())
+    if (!query.exec())
     {
-        qDebug()<<"Online Status Update failed!";
+        qDebug() << "Online Status Update failed!";
         return;
     }
 }
-
 
 /*void DatabaseManager::userTable_Update_Record(const QString& condition,const QString& newPassword)
 {
@@ -427,23 +442,20 @@ void DatabaseManager::userTable_Delete_Record(const QString& condition)
     qDebug()<<"deleted_Data not find!";
 }*/
 
-
-
-
-//Table2:friendlist
-void DatabaseManager::frdTable_Create_FriendListRecord(const Packege& send_Pkg)
+// Table2:friendlist
+void DatabaseManager::frdTable_Create_FriendListRecord(const Packege &send_Pkg)
 {
-    //插入数据
+    // 插入数据
     QSqlQuery query(db);
-    QString insertQuery ="INSERT INTO friendlist (user,friend,request,answer) VALUES (:user,:friend,:request,:answer)";
+    QString insertQuery = "INSERT INTO friendlist (user,friend,request,answer) VALUES (:user,:friend,:request,:answer)";
 
     query.prepare(insertQuery);
-    query.bindValue(":user",send_Pkg.sender);
-    query.bindValue(":friend",send_Pkg.receiver);
-    query.bindValue(":request",1);
-    query.bindValue(":answer",0);
+    query.bindValue(":user", send_Pkg.sender);
+    query.bindValue(":friend", send_Pkg.receiver);
+    query.bindValue(":request", 1);
+    query.bindValue(":answer", 0);
 
-    if(query.exec())
+    if (query.exec())
     {
         qDebug() << "Data(create_FriendListRecord) inserted successfully.";
     }
@@ -453,34 +465,32 @@ void DatabaseManager::frdTable_Create_FriendListRecord(const Packege& send_Pkg)
     }
 }
 
-
-
-void DatabaseManager::frdTable_ReadMyListRecord(QVector<QVector<Account_Message>>& friendListBarItemTextStates,const QString &account)
+void DatabaseManager::frdTable_ReadMyListRecord(QVector<QVector<Account_Message>> &friendListBarItemTextStates, const QString &account)
 {
     // 申请方为我
     QSqlQuery query(db);
     query.prepare(QString("SELECT * FROM friendlist WHERE user=:account"));
-    query.bindValue(":account",account);
+    query.bindValue(":account", account);
 
     /* pending_Verification   rejected */
-    if(query.exec())
+    if (query.exec())
     {
         while (query.next())
         {
             // 如果能移动到下一条记录，说明有符合条件的记录,然后再判断
             int request = query.value("request").toInt();
             int answer = query.value("answer").toInt();
-            if(request&&!answer)
+            if (request && !answer)
             {
                 // 等待验证
-                QString account=query.value("friend").toString();
+                QString account = query.value("friend").toString();
                 Account_Message friendInfo = userTable_Read_UserMessage(account);
                 friendListBarItemTextStates[0].push_back(friendInfo);
             }
-            else if(request&&answer)
+            else if (request && answer)
             {
                 // 已通过
-                QString account=query.value("friend").toString();
+                QString account = query.value("friend").toString();
                 Account_Message friendInfo = userTable_Read_UserMessage(account);
                 friendListBarItemTextStates[1].push_back(friendInfo);
             }
@@ -488,32 +498,32 @@ void DatabaseManager::frdTable_ReadMyListRecord(QVector<QVector<Account_Message>
     }
 }
 
-void DatabaseManager::frdTable_ReadOtherListRecord(QVector<QVector<Account_Message>>& friendListBarItemTextStates,const QString &account)
+void DatabaseManager::frdTable_ReadOtherListRecord(QVector<QVector<Account_Message>> &friendListBarItemTextStates, const QString &account)
 {
     // 申请方为对方
     QSqlQuery query(db);
     query.prepare(QString("SELECT * FROM friendlist WHERE friend=:account"));
-    query.bindValue(":account",account);
+    query.bindValue(":account", account);
 
     /* approved   to_Agree; */
-    if(query.exec())
+    if (query.exec())
     {
         while (query.next())
         {
             // 如果能移动到下一条记录，说明有符合条件的记录,然后再判断
             int request = query.value("request").toInt();
             int answer = query.value("answer").toInt();
-            if(request&&answer)
+            if (request && answer)
             {
                 // 已同意
-                QString account=query.value("user").toString();
+                QString account = query.value("user").toString();
                 Account_Message friendInfo = userTable_Read_UserMessage(account);
                 friendListBarItemTextStates[2].push_back(friendInfo);
             }
-            else if(request&&!answer)
+            else if (request && !answer)
             {
                 // 是否同意
-                QString account=query.value("user").toString();
+                QString account = query.value("user").toString();
                 Account_Message friendInfo = userTable_Read_UserMessage(account);
                 friendListBarItemTextStates[3].push_back(friendInfo);
             }
@@ -521,20 +531,19 @@ void DatabaseManager::frdTable_ReadOtherListRecord(QVector<QVector<Account_Messa
     }
 }
 
-QVector<Account_Message> DatabaseManager::frdTable_ReadFriendRecord(const QString& account)
+QVector<Account_Message> DatabaseManager::frdTable_ReadFriendRecord(const QString &account)
 {
 
     QVector<Account_Message> friend_List_Data;
 
     QSqlQuery query(db);
     query.prepare(QString("SELECT * FROM friendlist WHERE (user=:user OR friend=:user) AND request=1 AND answer=1"));
-    query.bindValue(":user",account);
-    if(query.exec())
+    query.bindValue(":user", account);
+    if (query.exec())
     {
-        while(query.next())
+        while (query.next())
         {
-            QString frd=query.value("friend").toString()!=account?query.value("friend").toString():
-                              query.value("user").toString();
+            QString frd = query.value("friend").toString() != account ? query.value("friend").toString() : query.value("user").toString();
             friend_List_Data.push_back(userTable_Read_UserMessage(frd));
         }
     }
@@ -542,42 +551,39 @@ QVector<Account_Message> DatabaseManager::frdTable_ReadFriendRecord(const QStrin
     return friend_List_Data;
 }
 
-void DatabaseManager::frdTable_Update_FriendListRecord(const Packege& friendRequestAgreementPackage)
+void DatabaseManager::frdTable_Update_FriendListRecord(const Packege &friendRequestAgreementPackage)
 {
     // 当对方同意好友申请时，更新数据库中好友列表记录的应答状态
     QSqlQuery updateQuery(db);
     updateQuery.prepare("UPDATE friendlist SET answer=1 WHERE (user=:user AND friend=:friend)");
-    updateQuery.bindValue(":user",friendRequestAgreementPackage.sender);
+    updateQuery.bindValue(":user", friendRequestAgreementPackage.sender);
     updateQuery.bindValue(":friend", friendRequestAgreementPackage.receiver);
-    if(!updateQuery.exec())
+    if (!updateQuery.exec())
     {
-        qDebug()<<"更新应答状态失败";
+        qDebug() << "更新应答状态失败";
     }
 }
 
-
-
-
-//Table3:chatrecords
-int DatabaseManager::chrTable_Create_ChatRecord(const Packege& send_Pkg)
+// Table3:chatrecords
+int DatabaseManager::chrTable_Create_ChatRecord(const Packege &send_Pkg)
 {
     /*主表插入数据*/
     QSqlQuery query(db);
-    QString insertQuery ="INSERT INTO chatlist (type,sender,receiver,sender_del,receiver_del,is_synced)"
+    QString insertQuery = "INSERT INTO chatlist (type,sender,receiver,sender_del,receiver_del,is_synced)"
                           " VALUES (:type,:sender,:receiver,:sender_del,:receiver_del,:is_synced)";
-    //绑定值
+    // 绑定值
     query.prepare(insertQuery);
-    query.bindValue(":type",send_Pkg.messageInfo.message_type);
-    query.bindValue(":sender",send_Pkg.sender);
-    query.bindValue(":receiver",send_Pkg.receiver);
-    query.bindValue(":sender_del",0);
-    query.bindValue(":receiver_del",0);
-    query.bindValue(":is_synced",0);    //默认未同步
+    query.bindValue(":type", send_Pkg.messageInfo.message_type);
+    query.bindValue(":sender", send_Pkg.sender);
+    query.bindValue(":receiver", send_Pkg.receiver);
+    query.bindValue(":sender_del", 0);
+    query.bindValue(":receiver_del", 0);
+    query.bindValue(":is_synced", 0); // 默认未同步
 
     int chatlist_Id;
-    if(query.exec())
+    if (query.exec())
     {
-        chatlist_Id = query.lastInsertId().toInt(); //获取自增 ID
+        chatlist_Id = query.lastInsertId().toInt(); // 获取自增 ID
         qDebug() << "Data inserted successfully.";
     }
     else
@@ -585,15 +591,14 @@ int DatabaseManager::chrTable_Create_ChatRecord(const Packege& send_Pkg)
         qDebug() << "Error inserting data: " << query.lastError().text();
     }
 
-
     /*次表插入数据*/
-    switch(send_Pkg.messageInfo.message_type)
+    switch (send_Pkg.messageInfo.message_type)
     {
     case RICHTEXTCONTENT_TRANSFERS:
-        textsTable_Create_TextsRecord(chatlist_Id,send_Pkg);
+        textsTable_Create_TextsRecord(chatlist_Id, send_Pkg);
         break;
     case BLOCK_FILE_TRANSFERS:
-        filesTable_Create_FilesRecord(chatlist_Id,send_Pkg);
+        filesTable_Create_FilesRecord(chatlist_Id, send_Pkg);
         break;
     }
 
@@ -601,7 +606,7 @@ int DatabaseManager::chrTable_Create_ChatRecord(const Packege& send_Pkg)
     return chatlist_Id;
 }
 
-QVector<Packege> DatabaseManager::chrTable_Read_ChatHistory(const QString& account)
+QVector<Packege> DatabaseManager::chrTable_Read_ChatHistory(const QString &account)
 {
     // 接收方消息同步
     QVector<Packege> chatHistory_Pkgs;
@@ -612,7 +617,6 @@ QVector<Packege> DatabaseManager::chrTable_Read_ChatHistory(const QString& accou
 
     // 使用命名绑定防止SQL注入
     query.bindValue(":account", account);
-
 
     if (!query.exec())
     {
@@ -625,31 +629,32 @@ QVector<Packege> DatabaseManager::chrTable_Read_ChatHistory(const QString& accou
         // 如果能移动到下一条记录，说明有符合条件的记录
         Packege dataPkg;
 
-        dataPkg.type=ASYNC_FETCH_CHATHISTORY;
-        dataPkg.sender=query.value("sender").toString();
-        dataPkg.receiver=query.value("receiver").toString();
-        dataPkg.messageInfo.sender_del=query.value("sender_del").toBool();
-        dataPkg.messageInfo.receiver_del=query.value("receiver_del").toBool();
-        dataPkg.timeStamp=query.value("send_time").toDateTime().toSecsSinceEpoch();
+        dataPkg.type = ASYNC_FETCH_CHATHISTORY;
+        dataPkg.sender = query.value("sender").toString();
+        dataPkg.receiver = query.value("receiver").toString();
+        dataPkg.messageInfo.sender_del = query.value("sender_del").toBool();
+        dataPkg.messageInfo.receiver_del = query.value("receiver_del").toBool();
+        dataPkg.timeStamp = query.value("send_time").toDateTime().toSecsSinceEpoch();
 
         // 更新为该条消息已同步
         int recordId = query.value("id").toInt(); // 假设表中有唯一标识字段 id
         markMessageSynced(recordId);
 
-        switch(query.value("type").toUInt())
+        switch (query.value("type").toUInt())
         {
         case RICHTEXTCONTENT_TRANSFERS:
         {
-            dataPkg.messageInfo.message_type=RICHTEXTCONTENT_TRANSFERS;
-            QString richText=textsTable_Read_TextsRecord(query.value("id").toInt());
-            if(richText=="") continue;
-            dataPkg.messageInfo.richText=richText;
+            dataPkg.messageInfo.message_type = RICHTEXTCONTENT_TRANSFERS;
+            QString richText = textsTable_Read_TextsRecord(query.value("id").toInt());
+            if (richText == "")
+                continue;
+            dataPkg.messageInfo.richText = richText;
         }
         break;
         case BLOCK_FILE_TRANSFERS:
         {
-            dataPkg.messageInfo.message_type=BLOCK_FILE_TRANSFERS;
-            dataPkg.messageInfo.file=filesTable_Read_FilesRecord(query.value("id").toInt());
+            dataPkg.messageInfo.message_type = BLOCK_FILE_TRANSFERS;
+            dataPkg.messageInfo.file = filesTable_Read_FilesRecord(query.value("id").toInt());
         }
         break;
         }
@@ -672,19 +677,19 @@ void DatabaseManager::markMessageSynced(int recordId)
     }
 }
 
-void DatabaseManager::textsTable_Create_TextsRecord(int chatlist_Id,const Packege& send_Pkg)
+void DatabaseManager::textsTable_Create_TextsRecord(int chatlist_Id, const Packege &send_Pkg)
 {
     /*将文本数据保存到表中*/
-    //插入数据
+    // 插入数据
     QSqlQuery query(db);
-    QString insertQuery ="INSERT INTO texts_transfers (chatlist_id,content)"
+    QString insertQuery = "INSERT INTO texts_transfers (chatlist_id,content)"
                           " VALUES (:chatlist_id,:content)";
 
     query.prepare(insertQuery);
-    query.bindValue(":chatlist_id",chatlist_Id);
-    query.bindValue(":content",send_Pkg.messageInfo.richText);
+    query.bindValue(":chatlist_id", chatlist_Id);
+    query.bindValue(":content", send_Pkg.messageInfo.richText);
 
-    if(query.exec())
+    if (query.exec())
     {
         qDebug() << "Data(textsTable_Create_TextsRecord) inserted successfully.";
     }
@@ -712,7 +717,7 @@ QString DatabaseManager::textsTable_Read_TextsRecord(int chatlist_Id)
     if (query.next())
     {
         const int contentIndex = query.record().indexOf("content");
-        if(contentIndex == -1)
+        if (contentIndex == -1)
         {
             qCritical() << "Field 'content' does not exist in query result";
             return QString();
@@ -723,23 +728,22 @@ QString DatabaseManager::textsTable_Read_TextsRecord(int chatlist_Id)
     return "";
 }
 
-
-void DatabaseManager::filesTable_Create_FilesRecord(int chatlist_Id,const Packege& send_Pkg)
+void DatabaseManager::filesTable_Create_FilesRecord(int chatlist_Id, const Packege &send_Pkg)
 {
     /*==================================将文件保存到本地==================================*/
-    //获取桌面路径
-    QString desktopPath=QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    // 获取桌面路径
+    QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     if (desktopPath.isEmpty())
     {
         qDebug() << "无法获取桌面路径";
         return;
     }
 
-    QString uuid=QUuid::createUuid().toString(QUuid::WithoutBraces);
+    QString uuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
     // 构建目标目录路径
-    QString account=send_Pkg.sender;
-    QString fileType=send_Pkg.messageInfo.file.fileType;
+    QString account = send_Pkg.sender;
+    QString fileType = send_Pkg.messageInfo.file.fileType;
     QString dirPath = desktopPath + "/QQ_Application_Data/" + account;
     // 创建 QDir 对象
     QDir dir;
@@ -749,36 +753,33 @@ void DatabaseManager::filesTable_Create_FilesRecord(int chatlist_Id,const Packeg
         return;
     }
 
-
     // 构建完整文件路径
-    QString filePath = dirPath + "/" + uuid + "." + fileType;  // 注意文件扩展名前的点
+    QString filePath = dirPath + "/" + uuid + "." + fileType; // 注意文件扩展名前的点
     QFile file(filePath);
-    if(file.open(QIODevice::WriteOnly))
+    if (file.open(QIODevice::WriteOnly))
     {
         file.write(send_Pkg.messageInfo.file.fileContent);
         file.close();
-        qDebug()<<"文件保存成功";
+        qDebug() << "文件保存成功";
     }
     else
     {
-        qDebug()<<"无法打开文件进行写入:"<<file.errorString();
+        qDebug() << "无法打开文件进行写入:" << file.errorString();
         return;
     }
 
-
-
     /*=============================将文件属性保存到表中===============================*/
-    //插入数据
+    // 插入数据
     QSqlQuery query(db);
-    QString insertQuery ="INSERT INTO file_transfers (chatlist_id,file_path,file_name)"
+    QString insertQuery = "INSERT INTO file_transfers (chatlist_id,file_path,file_name)"
                           " VALUES (:chatlist_id,:file_path,:file_name)";
 
     query.prepare(insertQuery);
-    query.bindValue(":chatlist_id",chatlist_Id);
-    query.bindValue(":file_path",filePath);
-    query.bindValue(":file_name",send_Pkg.messageInfo.file.fileName);
+    query.bindValue(":chatlist_id", chatlist_Id);
+    query.bindValue(":file_path", filePath);
+    query.bindValue(":file_name", send_Pkg.messageInfo.file.fileName);
 
-    if(query.exec())
+    if (query.exec())
     {
         qDebug() << "Data(filesTable_Create_FilesRecord) inserted successfully.";
     }
@@ -797,22 +798,22 @@ File DatabaseManager::filesTable_Read_FilesRecord(int chatlist_Id)
     // 使用命名绑定防止SQL注入
     query.bindValue(":chatlist_id", chatlist_Id);
 
-    if(!query.exec())
+    if (!query.exec())
     {
         qCritical() << "Failed to fetch file history:" << query.lastError().text();
         return file; // 默认空值
     }
 
-    if(query.next())
+    if (query.next())
     {
         // 1. 从数据库获取路径和文件名
-        QString filePath=query.value("file_path").toString();
-        QString fileName=query.value("file_name").toString();
-        file.fileName=fileName;
+        QString filePath = query.value("file_path").toString();
+        QString fileName = query.value("file_name").toString();
+        file.fileName = fileName;
 
         // 2. 从本地文件读取内容和大小
         QFile localFile(filePath);
-        if(localFile.open(QIODevice::ReadOnly))
+        if (localFile.open(QIODevice::ReadOnly))
         {
             file.fileContent = localFile.readAll(); // 读取二进制内容
             file.fileSize = localFile.size();       // 获取文件大小（字节）
@@ -832,23 +833,22 @@ File DatabaseManager::filesTable_Read_FilesRecord(int chatlist_Id)
     return file;
 }
 
-
-QVector<Image> DatabaseManager::mediaTable_Create_MediaRecord(const Packege& send_Pkg)
+QVector<Image> DatabaseManager::mediaTable_Create_MediaRecord(const Packege &send_Pkg)
 {
     /*==================================将图片保存到本地==================================*/
     QVector<Image> savedImagesInfo;
     // 预分配空间
     savedImagesInfo.resize(send_Pkg.messageInfo.images.size());
 
-    //获取桌面路径
-    QString desktopPath=QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    // 获取桌面路径
+    QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     if (desktopPath.isEmpty())
     {
         qDebug() << "无法获取桌面路径";
         return savedImagesInfo;
     }
     // 构建目标目录路径
-    QString account=send_Pkg.sender;
+    QString account = send_Pkg.sender;
     QString dirPath = desktopPath + "/QQ_Application_Data/" + account;
     // 创建 QDir 对象
     QDir dir;
@@ -859,39 +859,37 @@ QVector<Image> DatabaseManager::mediaTable_Create_MediaRecord(const Packege& sen
     }
 
     QVector<Image> images = send_Pkg.messageInfo.images;
-    for(int i=0;i<images.size();i++)
+    for (int i = 0; i < images.size(); i++)
     {
         // 构建完整图片路径
-        QString uuid=QUuid::createUuid().toString(QUuid::WithoutBraces);
-        QString imageType=images[i].imageType;
-        QString imagePath = dirPath + "/" + uuid + "." + imageType;  // 注意文件扩展名前的点
+        QString uuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        QString imageType = images[i].imageType;
+        QString imagePath = dirPath + "/" + uuid + "." + imageType; // 注意文件扩展名前的点
         QFile image(imagePath);
-        if(image.open(QIODevice::WriteOnly))
+        if (image.open(QIODevice::WriteOnly))
         {
             image.write(images[i].imageData);
             image.close();
-            qDebug()<<"图片保存成功";
+            qDebug() << "图片保存成功";
         }
         else
         {
-            qDebug()<<"无法打开图片进行写入:"<<image.errorString();
+            qDebug() << "无法打开图片进行写入:" << image.errorString();
             return savedImagesInfo;
         }
 
-
-
         //============================= 将图片属性保存到表中 ===============================
-        //插入数据
+        // 插入数据
         QSqlQuery query(db);
-        QString insertQuery ="INSERT INTO media_transfers (account,media_path,media_name)"
+        QString insertQuery = "INSERT INTO media_transfers (account,media_path,media_name)"
                               " VALUES (:account,:media_path,:media_name)";
 
         query.prepare(insertQuery);
-        query.bindValue(":account",send_Pkg.sender);
-        query.bindValue(":media_path",imagePath);
-        query.bindValue(":media_name",images[i].imageName);
+        query.bindValue(":account", send_Pkg.sender);
+        query.bindValue(":media_path", imagePath);
+        query.bindValue(":media_name", images[i].imageName);
 
-        if(query.exec())
+        if (query.exec())
         {
             qDebug() << "Data(mediaTable_Create_MediaRecord) inserted successfully.";
         }
@@ -922,14 +920,11 @@ QString DatabaseManager::mediaTable_Select_Media_Name(const QString &media_Path)
         return "";
     }
 
-    if(query.next())
+    if (query.next())
     {
-        QString media_Name=query.value("media_name").toString();
+        QString media_Name = query.value("media_name").toString();
         return media_Name;
     }
 
     return "";
 }
-
-
-

@@ -21,9 +21,9 @@ VideoSender::VideoSender(QObject *parent)
 
     camera = new QCamera(QMediaDevices::defaultVideoInput());
     captureSession.setCamera(camera);
-    QVideoSink* sink = new QVideoSink(this);
+    QVideoSink *sink = new QVideoSink(this);
     captureSession.setVideoSink(sink);
-    connect(sink,&QVideoSink::videoFrameChanged,this,&VideoSender::processFrame);
+    connect(sink, &QVideoSink::videoFrameChanged, this, &VideoSender::processFrame);
 }
 
 VideoSender::~VideoSender()
@@ -34,31 +34,27 @@ VideoSender::~VideoSender()
     // delete thread;
 }
 
-
 void VideoSender::startCapture()
 {
     camera->start();
 }
-
-
 
 void VideoSender::stopCapture()
 {
     camera->stop();
 }
 
-
 void VideoSender::updateConnectedIpPort(const QString &IP, const quint64 &port)
 {
-    targetAddr=IP;
-    targetPort=port;
+    targetAddr = IP;
+    targetPort = port;
 }
-
 
 void VideoSender::processFrame(const QVideoFrame &frame)
 {
     QImage image = frame.toImage();
-    if(image.isNull()) return;
+    if (image.isNull())
+        return;
 
     // 转换为 RGB32 格式
     image = image.convertToFormat(QImage::Format_RGB32);
@@ -67,7 +63,7 @@ void VideoSender::processFrame(const QVideoFrame &frame)
     QByteArray byteArray;
     QBuffer buffer(&byteArray);
     buffer.open(QIODevice::WriteOnly);
-    if (image.save(&buffer, "JPEG", 30))// 检查保存是否成功
+    if (image.save(&buffer, "JPEG", 30)) // 检查保存是否成功
     {
         udpSocket->writeDatagram(byteArray, QHostAddress(targetAddr), targetPort);
     }

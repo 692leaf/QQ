@@ -13,21 +13,22 @@
 #include "SpecificChatWindow.h"
 #include "FriendDetailWidget.h"
 
-
 class MainPage : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MainPage(QWidget *parent = nullptr,TcpClient* client=nullptr,LocalDatabase* localBase=nullptr);
+    explicit MainPage(QWidget *parent = nullptr, TcpClient *client = nullptr, LocalDatabase *localBase = nullptr);
     ~MainPage();
     void initUi();
+
 private:
     enum class Operation
     {
         NONE,
-        CHATLIST, //聊天界面
-        BUDDYLIST, //好友列表界面
+        CHATLIST,  // 聊天界面
+        BUDDYLIST, // 好友列表界面
     };
+
 protected:
     void closeEvent(QCloseEvent *event) override;
 private slots:
@@ -39,24 +40,24 @@ private slots:
     void switchSpecificWindow(int index);
 
 private:
-    TcpClient* client;
-    LocalDatabase* localBase;
+    TcpClient *client;
+    LocalDatabase *localBase;
     // 声明托盘变量
-    SysTray* m_sysTray;
-    //声明布局
-    QStackedLayout* sLayout_Sec;
-    QStackedLayout* sLayout_SpecificWindow;
-    QHBoxLayout* hLayout;
+    SysTray *m_sysTray;
+    // 声明布局
+    QStackedLayout *sLayout_Sec;
+    QStackedLayout *sLayout_SpecificWindow;
+    QHBoxLayout *hLayout;
 
-    ToolBar* tBar;
+    ToolBar *tBar;
 
-    ChatList* ctList;
-    FriendList* fdList;
+    ChatList *ctList;
+    FriendList *fdList;
 
-    DefaultWindow* dftWindow;
-    NotificationManager* notifManager;
-    SpecificChatWindow* chatWindow;
-    FriendDetailWidget* frdDetailWidget;
+    DefaultWindow *dftWindow;
+    NotificationManager *notifManager;
+    SpecificChatWindow *chatWindow;
+    FriendDetailWidget *frdDetailWidget;
 
 signals:
     void askFriendListDataRequest();

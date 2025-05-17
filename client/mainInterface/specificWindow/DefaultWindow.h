@@ -2,15 +2,16 @@
 #define DEFAULTWINDOW_H
 
 #include <QWidget>
-#include<QLabel>
+#include <QLabel>
 
 class DefaultWindow : public QWidget
 {
     Q_OBJECT
 public:
     explicit DefaultWindow(QWidget *parent = nullptr);
+
 private:
-    QLabel* imageLabel;
+    QLabel *imageLabel;
 };
 
 #endif // DEFAULTWINDOW_H

@@ -3,7 +3,8 @@
 
 FriendListItemDelegate::FriendListItemDelegate(QObject *parent)
     : QStyledItemDelegate{parent}
-{}
+{
+}
 
 void FriendListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
@@ -33,7 +34,8 @@ void FriendListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem
     // 绘制头像
     QRect avatarRect = option.rect.adjusted(padding, padding, 0, -padding);
     avatarRect.setSize(QSize(avatarSize, avatarSize));
-    if (!avatar.isNull()) {
+    if (!avatar.isNull())
+    {
         painter->drawPixmap(avatarRect, avatar.scaled(avatarSize, avatarSize,
                                                       Qt::KeepAspectRatio, Qt::SmoothTransformation));
     }
@@ -43,8 +45,7 @@ void FriendListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem
         avatarSize + 2 * padding,
         padding,
         -padding - bracketWidth * 2,
-        -padding
-        );
+        -padding);
 
     // 用户名
     QFont nameFont = QApplication::font();
@@ -57,10 +58,9 @@ void FriendListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem
     const int statusHeight = bracketMetrics.height();
     QRect statusRect = QRect(
         textRect.left(),
-        textRect.bottom() - statusHeight - padding/2,
+        textRect.bottom() - statusHeight - padding / 2,
         textRect.width(),
-        statusHeight
-        );
+        statusHeight);
 
     // 绘制括号
     QFont bracketFont = QApplication::font();
@@ -72,35 +72,31 @@ void FriendListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem
     painter->drawText(
         statusRect.left(),
         statusRect.top() + bracketMetrics.ascent(),
-        "["
-        );
+        "[");
 
     // 状态内容
-    QString statusText = isOnline ? "● 在线" : "\u25CF 离线";  // 实心圆圈的Unicode字符编码
+    QString statusText = isOnline ? "● 在线" : "\u25CF 离线"; // 实心圆圈的Unicode字符编码
     int textWidth = painter->fontMetrics().horizontalAdvance(statusText);
 
     // 右括号
     painter->drawText(
         statusRect.left() + bracketWidth + textWidth + 4,
         statusRect.top() + bracketMetrics.ascent(),
-        "]"
-        );
+        "]");
 
     // 绘制状态内容（居中处理）
     QRect statusContentRect(
         statusRect.left() + bracketWidth,
         statusRect.top(),
         textWidth,
-        statusHeight
-        );
+        statusHeight);
 
     // 垂直居中绘制
     painter->setPen(isOnline ? QColor("#00C800") : QColor("#3D3D3D"));
     painter->drawText(
         statusContentRect,
         Qt::AlignVCenter | Qt::AlignLeft,
-        statusText
-        );
+        statusText);
 
     painter->restore();
 }

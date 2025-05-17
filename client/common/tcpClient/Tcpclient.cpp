@@ -6,23 +6,23 @@
 TcpClient::TcpClient(QObject *parent)
     : QObject{parent}
 {
-    socket=new QTcpSocket;
+    socket = new QTcpSocket;
 
     // 连接信号
-    connect(socket,&QTcpSocket::connected,this,&TcpClient::onConnected);
-    connect(socket,&QTcpSocket::errorOccurred,this,&TcpClient::onConnectionError);
+    connect(socket, &QTcpSocket::connected, this, &TcpClient::onConnected);
+    connect(socket, &QTcpSocket::errorOccurred, this, &TcpClient::onConnectionError);
 
     serverConnect();
 
-    connect(this,&TcpClient::heartbeatTimeout,[this](){
-        if (socket->state() == QAbstractSocket::ConnectedState)
-        {
-            socket->disconnectFromHost();
-        }
-        serverConnect();  // 重新连接
-    });
+    connect(this, &TcpClient::heartbeatTimeout, [this]()
+            {
+                if (socket->state() == QAbstractSocket::ConnectedState)
+                {
+                    socket->disconnectFromHost();
+                }
+                serverConnect(); // 重新连接
+            });
 }
-
 
 TcpClient::~TcpClient()
 {
@@ -36,19 +36,20 @@ TcpClient::~TcpClient()
 void TcpClient::initHeartBeat(int intervalMs)
 {
     // 将传入的参数赋给类的成员变量
-    this->intervalMs=intervalMs;
-    heartbeatTimer=new QTimer(this);
+    this->intervalMs = intervalMs;
+    heartbeatTimer = new QTimer(this);
     heartbeatTimer->setInterval(intervalMs);
-    timeoutTimer=new QTimer(this);
-    timeoutTimer->setInterval(0.5*intervalMs);
+    timeoutTimer = new QTimer(this);
+    timeoutTimer->setInterval(0.5 * intervalMs);
     // 启动超时监测
     heartbeatTimer->start();
-    connect(this,&TcpClient::messageReceived,this,&TcpClient::heartbeatTimeCheck);
+    connect(this, &TcpClient::messageReceived, this, &TcpClient::heartbeatTimeCheck);
 }
 
 void TcpClient::heartbeatSent()
 {
-    connect(heartbeatTimer, &QTimer::timeout, this, [this]{
+    connect(heartbeatTimer, &QTimer::timeout, this, [this]
+            {
         if (socket->state() != QAbstractSocket::ConnectedState) return;
 
         // 发送心跳包
@@ -58,46 +59,44 @@ void TcpClient::heartbeatSent()
         heartbeat_Pkg.timeStamp= QDateTime::currentMSecsSinceEpoch();
         sendMessage(heartbeat_Pkg);
         // 启动心跳超时检测
-        timeoutTimer->start();
-    });
+        timeoutTimer->start(); });
 
-    //超时处理
-    connect(timeoutTimer, &QTimer::timeout, [this] (){
+    // 超时处理
+    connect(timeoutTimer, &QTimer::timeout, [this]()
+            {
         emit heartbeatTimeout();
-        timeoutTimer->stop();
-    });
+        timeoutTimer->stop(); });
 }
 
-void TcpClient::heartbeatTimeCheck(const Packege& resend_Pkg)
+void TcpClient::heartbeatTimeCheck(const Packege &resend_Pkg)
 {
-    if(resend_Pkg.type!=HEARTBEAT_MONITORING) return;
+    if (resend_Pkg.type != HEARTBEAT_MONITORING)
+        return;
     // 收到心跳响应，停止超时检测
-    if(QDateTime::currentMSecsSinceEpoch()-resend_Pkg.timeStamp<intervalMs)
+    if (QDateTime::currentMSecsSinceEpoch() - resend_Pkg.timeStamp < intervalMs)
     {
         timeoutTimer->stop();
     }
 }
 
-
 void TcpClient::serverConnect()
 {
-    QString ip="127.0.0.1";
-    QString port="6000";
-    socket->connectToHost(QHostAddress(ip),port.toUShort());
+    QString ip = "127.0.0.1";
+    QString port = "6000";
+    socket->connectToHost(QHostAddress(ip), port.toUShort());
 }
-
-
 
 void TcpClient::readMessage()
 {
-    if(!socket) return;
+    if (!socket)
+        return;
 
     /*新增粘包处理*/
     // 维护每个socket的接收缓冲区
     QByteArray &buffer = socketBuffer;
     buffer += socket->readAll();
 
-    //完整包的数据
+    // 完整包的数据
     QByteArray pkgData;
     // 包处理循环
     while (true)
@@ -130,9 +129,7 @@ void TcpClient::readMessage()
     }
 }
 
-
-
-bool TcpClient::sendMessage(const Packege& send_Pkg)
+bool TcpClient::sendMessage(const Packege &send_Pkg)
 {
     /*qDebug()<<"message_type:"<<send_Pkg.messageInfo.message_type;
     qDebug()<<"fileContent:"<<send_Pkg.messageInfo.file.fileContent;*/
@@ -142,8 +139,7 @@ bool TcpClient::sendMessage(const Packege& send_Pkg)
         return false;
     }
 
-
-    //序列化数据
+    // 序列化数据
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_5); // 必须与服务器端一致
@@ -155,33 +151,26 @@ bool TcpClient::sendMessage(const Packege& send_Pkg)
 
     // 回到数据开头写入实际长度
     out.device()->seek(0);
-    out << quint32(block.size()-sizeof(quint32));
-
+    out << quint32(block.size() - sizeof(quint32));
 
     // 发送数据
-    return socket->write(block)!=-1;
+    return socket->write(block) != -1;
 }
 
-void TcpClient::processPackage(Packege& resend_Pkg)
+void TcpClient::processPackage(Packege &resend_Pkg)
 {
     emit messageReceived(resend_Pkg);
 }
 
-
 void TcpClient::onConnected()
 {
-    connect(socket,&QTcpSocket::readyRead,this,&TcpClient::readMessage);
+    connect(socket, &QTcpSocket::readyRead, this, &TcpClient::readMessage);
 }
 
 void TcpClient::onConnectionError()
 {
-    if(socket)
+    if (socket)
     {
-        QMessageBox::information(nullptr,"连接提示","连接服务器失败:"+socket->errorString());
+        QMessageBox::information(nullptr, "连接提示", "连接服务器失败:" + socket->errorString());
     }
-
 }
-
-
-
-

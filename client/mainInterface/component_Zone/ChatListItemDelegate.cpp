@@ -3,7 +3,8 @@
 
 ChatListItemDelegate::ChatListItemDelegate(QObject *parent)
     : QStyledItemDelegate{parent}
-{}
+{
+}
 
 void ChatListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
@@ -25,10 +26,10 @@ void ChatListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     }
 
     // 布局参数
-    const int padding = 8;          // 内边距
-    const int avatarSize = 40;      // 头像大小
-    const int textSpacing = 2;      // 文字间距
-    const int maxMsgLength = 20;    // 最大显示消息长度
+    const int padding = 8;       // 内边距
+    const int avatarSize = 40;   // 头像大小
+    const int textSpacing = 2;   // 文字间距
+    const int maxMsgLength = 20; // 最大显示消息长度
 
     // 绘制头像
     QRect avatarRect = option.rect.adjusted(padding, padding, 0, -padding);
@@ -58,7 +59,8 @@ void ChatListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
 
     // 消息截断处理
     QString displayMsg = latestMsg;
-    if (latestMsg.length() > maxMsgLength) {
+    if (latestMsg.length() > maxMsgLength)
+    {
         displayMsg = latestMsg.left(maxMsgLength - 3) + "...";
     }
 

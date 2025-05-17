@@ -13,7 +13,8 @@ ServerTray::ServerTray(QObject *parent) : QObject(parent)
 }
 
 ServerTray::~ServerTray()
-{}
+{
+}
 
 void ServerTray::show()
 {
@@ -57,7 +58,8 @@ void ServerTray::createMenu()
 
 void ServerTray::onTrayActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    if(reason == QSystemTrayIcon::DoubleClick) {
+    if (reason == QSystemTrayIcon::DoubleClick)
+    {
         emit restoreRequested();
     }
 }

@@ -47,14 +47,14 @@ void EmojiUnicodeMapper::emoji_Unicode_Mapping()
     emojiToUnicodeMap["电话"] = "1F4DE";
     emojiToUnicodeMap["电视机"] = "1F4FA";
     emojiToUnicodeMap["礼物"] = "1F381";
-
 }
 
 QString EmojiUnicodeMapper::get_Unicode(const QString &emojiName)
 {
     // 获取码点字符串（如"1F635 FE0F 200D 1F4AB"）
     QString unicodeStr = emojiToUnicodeMap.value(emojiName, "");
-    if(unicodeStr.isEmpty()) return "[动画表情]";
+    if (unicodeStr.isEmpty())
+        return "[动画表情]";
 
     // 将码点字符串转换为Emoji字符
     QStringList codePoints = unicodeStr.split(' ', Qt::SkipEmptyParts);
@@ -64,7 +64,8 @@ QString EmojiUnicodeMapper::get_Unicode(const QString &emojiName)
     {
         bool ok;
         uint32_t codePoint = code.toUInt(&ok, 16);
-        if (!ok) continue;
+        if (!ok)
+            continue;
 
         if (codePoint <= 0xFFFF)
         {
@@ -79,4 +80,3 @@ QString EmojiUnicodeMapper::get_Unicode(const QString &emojiName)
 
     return emoji.isEmpty() ? "[动画表情]" : emoji;
 }
-

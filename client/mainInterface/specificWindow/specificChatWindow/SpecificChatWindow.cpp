@@ -16,21 +16,21 @@
 #include <QDesktopServices>
 #include <QTextBlock>
 
-SpecificChatWindow::SpecificChatWindow(QWidget *parent,TcpClient* client,LocalDatabase* localBase)
+SpecificChatWindow::SpecificChatWindow(QWidget *parent, TcpClient *client, LocalDatabase *localBase)
     : QWidget{parent},
-    client(client),
-    localBase(localBase),
-    sLayout(new QStackedLayout(this)),
-    emojiMgr(new EmojiManager)
+      client(client),
+      localBase(localBase),
+      sLayout(new QStackedLayout(this)),
+      emojiMgr(new EmojiManager)
 {
     // 图片的接收与显示
-    connect(client,&TcpClient::messageReceived,this,&SpecificChatWindow::handleIncomingPeerRichTextMessage);
-    connect(this,&SpecificChatWindow::imageUrlsGenerated,[this](const Packege& url_Pkg){
-        if(url_Pkg.type==SEND_RICHTEXT_MESSAGE || url_Pkg.type==LOAD_CHATHISTORY) addMessage(url_Pkg);
-    });
+    connect(client, &TcpClient::messageReceived, this, &SpecificChatWindow::handleIncomingPeerRichTextMessage);
+    connect(this, &SpecificChatWindow::imageUrlsGenerated, [this](const Packege &url_Pkg)
+            {
+        if(url_Pkg.type==SEND_RICHTEXT_MESSAGE || url_Pkg.type==LOAD_CHATHISTORY) addMessage(url_Pkg); });
 
-    connect(client,&TcpClient::messageReceived,this,&SpecificChatWindow::handleIncomingPeerFileMessage);
-    connect(client,&TcpClient::messageReceived,this,&SpecificChatWindow::handleServerChatHistoryResp);
+    connect(client, &TcpClient::messageReceived, this, &SpecificChatWindow::handleIncomingPeerFileMessage);
+    connect(client, &TcpClient::messageReceived, this, &SpecificChatWindow::handleServerChatHistoryResp);
     initUi();
 }
 
@@ -39,38 +39,34 @@ SpecificChatWindow::~SpecificChatWindow()
     delete emojiMgr;
 }
 
-
 /***********************************************************************************************
-*                                 实现窗口整体布局                                               *
-*                                 1.顶部菜单栏                                                  *
-*                                 2.显示窗口与输入框                                             *
-***********************************************************************************************/
+ *                                 实现窗口整体布局                                               *
+ *                                 1.顶部菜单栏                                                  *
+ *                                 2.显示窗口与输入框                                             *
+ ***********************************************************************************************/
 void SpecificChatWindow::initUi()
 {
-    toolBar=topToolBar();
+    toolBar = topToolBar();
     onScreen_Widget = new QWidget(this); // 创建QStackWidget
 
-    //创建布局
-    vLayout=new QVBoxLayout(this);
-    //添加窗口
+    // 创建布局
+    vLayout = new QVBoxLayout(this);
+    // 添加窗口
     vLayout->addWidget(toolBar);
     vLayout->addWidget(onScreen_Widget);
 
-    //中间窗口的添加stackedLayout布局
+    // 中间窗口的添加stackedLayout布局
     onScreen_Widget->setLayout(sLayout);
 
     this->setLayout(vLayout);
-    this->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-
+    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
-
 
 QToolBar *SpecificChatWindow::topToolBar()
 {
-    QToolBar* topNavigationToolBar =createTopToolBar();
+    QToolBar *topNavigationToolBar = createTopToolBar();
     return topNavigationToolBar;
 }
-
 
 void SpecificChatWindow::OpenChatWidget(const QString &user)
 {
@@ -84,15 +80,14 @@ void SpecificChatWindow::OpenChatWidget(const QString &user)
         return;
     }
 
-
     // 若没有该用户的窗口，则新建
     // 创建垂直分离器
-    QSplitter* splitter=new QSplitter(Qt::Vertical);
-    QListWidget* chatListWidget = new QListWidget;// 消息列表控件
-    QWidget* inputWidget=inputWindow();
+    QSplitter *splitter = new QSplitter(Qt::Vertical);
+    QListWidget *chatListWidget = new QListWidget; // 消息列表控件
+    QWidget *inputWidget = inputWindow();
 
     // 列表控件属性设置
-    chatListWidget->setVerticalScrollMode(QListWidget::ScrollPerPixel); // 平滑滚动
+    chatListWidget->setVerticalScrollMode(QListWidget::ScrollPerPixel);   // 平滑滚动
     chatListWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // 禁用水平滚动条
 
     // 向分离器中加窗口
@@ -100,7 +95,7 @@ void SpecificChatWindow::OpenChatWidget(const QString &user)
     splitter->addWidget(inputWidget);
 
     // 设置Splitter的默认分配比例（上部分占60%，下部分占40%）
-    splitter->setSizes({ static_cast<int>(height() * 0.6), static_cast<int>(height() * 0.4) });
+    splitter->setSizes({static_cast<int>(height() * 0.6), static_cast<int>(height() * 0.4)});
 
     sLayout->addWidget(splitter);
     userChatSplitters[user] = splitter;
@@ -111,10 +106,10 @@ void SpecificChatWindow::OpenChatWidget(const QString &user)
 
 QWidget *SpecificChatWindow::inputWindow()
 {
-    QWidget* w=new QWidget(this);
-    QToolBar* bottomActionToolBar=createbottomToolBar();
-    QTextEdit* textEdit=new QTextEdit(this);
-    QPushButton* sendButton=new QPushButton("发送",this);
+    QWidget *w = new QWidget(this);
+    QToolBar *bottomActionToolBar = createbottomToolBar();
+    QTextEdit *textEdit = new QTextEdit(this);
+    QPushButton *sendButton = new QPushButton("发送", this);
 
     // 文本设置
     textEdit->setAcceptRichText(true);                            // 允许富文本
@@ -125,12 +120,12 @@ QWidget *SpecificChatWindow::inputWindow()
     spring->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
     // 对弹簧和控件水平布局
-    QHBoxLayout* hLayout=new QHBoxLayout;
+    QHBoxLayout *hLayout = new QHBoxLayout;
     hLayout->addWidget(spring);
     hLayout->addWidget(sendButton);
 
     // 再垂直布局
-    QVBoxLayout* vLayout=new QVBoxLayout;
+    QVBoxLayout *vLayout = new QVBoxLayout;
     vLayout->addWidget(bottomActionToolBar);
     vLayout->addWidget(textEdit);
     vLayout->addLayout(hLayout);
@@ -140,7 +135,8 @@ QWidget *SpecificChatWindow::inputWindow()
     /*======================= 添加表情包 =====================*/
 
     // 输入框中添加表情包
-    connect(emojiMgr,&EmojiManager::emojiClicked,[this,textEdit](const QString& emojiPath){
+    connect(emojiMgr, &EmojiManager::emojiClicked, [this, textEdit](const QString &emojiPath)
+            {
         // 插入表情包到输入框
         QTextCursor cursor = textEdit->textCursor();
         QTextImageFormat imageFormat;
@@ -153,13 +149,13 @@ QWidget *SpecificChatWindow::inputWindow()
             imageFormat.setWidth(pixmap.width());
             imageFormat.setHeight(pixmap.height());
             cursor.insertImage(imageFormat); // 插入自定义表情包对象
-        }
-    });
+        } });
 
     /*======================= 添加图片 =====================*/
 
     // 输入框中添加图片
-    connect(this,&SpecificChatWindow::imageSelectionCompleted,[this,textEdit](const QStringList& imagePaths){
+    connect(this, &SpecificChatWindow::imageSelectionCompleted, [this, textEdit](const QStringList &imagePaths)
+            {
         for(const QString& path:imagePaths)
         {
             // 插入图片到输入框
@@ -176,13 +172,13 @@ QWidget *SpecificChatWindow::inputWindow()
                 imageFormat.setHeight(pixmap.height());
                 cursor.insertImage(imageFormat); // 插入自定义图像对象
             }
-        }
-    });
+        } });
 
     /*==================== 上传图片 ===================*/
 
     // 点击按钮上传图片
-    connect(sendButton,&QPushButton::clicked,[this,textEdit](){
+    connect(sendButton, &QPushButton::clicked, [this, textEdit]()
+            {
         if(textEdit->document()->isEmpty()) return;
 
         // 1. 提取富文本中的图片资源和位置,并显示文本到本地窗口上
@@ -231,33 +227,31 @@ QWidget *SpecificChatWindow::inputWindow()
         url_Pkg.messageInfo.richText=textEdit->toHtml();
         generateLocalImageUrls(url_Pkg);
 
-        textEdit->clear();
-    });
+        textEdit->clear(); });
 
     return w;
 }
 
-
 /***********************************************************************************************
-*                                 实现菜单栏外观                                                 *
-*                                 1.顶部菜单外观                                                 *
-*                                 2.输入框菜单外观                                               *
-***********************************************************************************************/
+ *                                 实现菜单栏外观                                                 *
+ *                                 1.顶部菜单外观                                                 *
+ *                                 2.输入框菜单外观                                               *
+ ***********************************************************************************************/
 QToolBar *SpecificChatWindow::createTopToolBar()
 {
-    QToolBar* topNavigationToolBar=new QToolBar(this);
+    QToolBar *topNavigationToolBar = new QToolBar(this);
     // Voice Call, Video Call, Screen Sharing, Invite to Join the Group, Group Settings
-    QAction* voiceCall=new QAction(QIcon(":/resource/image/voiceCall.png"),"",this);
-    QAction* videoCall=new QAction(QIcon(":/resource/image/videoCall.png"),"",this);
-    QAction* screenSharing=new QAction(QIcon(":/resource/image/screenSharing.png"),"",this);
-    QAction* joinGroup=new QAction(QIcon(":/resource/image/joinGroup.png"),"",this);
-    QAction* groupSettings=new QAction(QIcon(":/resource/image/groupSettings.png"),"",this);
+    QAction *voiceCall = new QAction(QIcon(":/resource/image/voiceCall.png"), "", this);
+    QAction *videoCall = new QAction(QIcon(":/resource/image/videoCall.png"), "", this);
+    QAction *screenSharing = new QAction(QIcon(":/resource/image/screenSharing.png"), "", this);
+    QAction *joinGroup = new QAction(QIcon(":/resource/image/joinGroup.png"), "", this);
+    QAction *groupSettings = new QAction(QIcon(":/resource/image/groupSettings.png"), "", this);
 
-    //向tBar中添加组件
-    username_Label=new QLabel("",this);
+    // 向tBar中添加组件
+    username_Label = new QLabel("", this);
     topNavigationToolBar->addWidget(username_Label);
 
-    //加弹簧
+    // 加弹簧
     QWidget *spring = new QWidget(this);
     spring->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     topNavigationToolBar->addWidget(spring);
@@ -268,16 +262,16 @@ QToolBar *SpecificChatWindow::createTopToolBar()
     topNavigationToolBar->addAction(joinGroup);
     topNavigationToolBar->addAction(groupSettings);
 
-    //设置提示词
+    // 设置提示词
     voiceCall->setToolTip("语音通话");
     videoCall->setToolTip("视频通话");
     screenSharing->setToolTip("屏幕共享");
     joinGroup->setToolTip("发起群聊");
     groupSettings->setToolTip("设置");
 
-
-    //发送方发出视频请求
-    connect(videoCall,&QAction::triggered,[this](){
+    // 发送方发出视频请求
+    connect(videoCall, &QAction::triggered, [this]()
+            {
         // 先创建 VideoReceiver 和 VideoSender
         videoReceiver = new VideoReceiver(this);
         videoSender = new VideoSender(this);
@@ -326,19 +320,17 @@ QToolBar *SpecificChatWindow::createTopToolBar()
                     }
                 }
             });
-        }
-    });
-    //接收方处理视频请求
-    connect(client,&TcpClient::messageReceived,[this](const Packege& send_Pkg){
+        } });
+    // 接收方处理视频请求
+    connect(client, &TcpClient::messageReceived, [this](const Packege &send_Pkg)
+            {
         if(send_Pkg.type!=VIDEO_SIGNALING_MESSAGE_SEND) return;
         //弹出信令窗口
-        videoSignalingDialog(send_Pkg);
-    });
+        videoSignalingDialog(send_Pkg); });
 
-
-
-    //发送方发出语音请求
-    connect(voiceCall,&QAction::triggered,[this](){
+    // 发送方发出语音请求
+    connect(voiceCall, &QAction::triggered, [this]()
+            {
         voiceCallDialog();
         audioReceiver = new AudioReceiver(this);
         audioSender = new AudioSender(this);
@@ -375,30 +367,29 @@ QToolBar *SpecificChatWindow::createTopToolBar()
                     }
                 }
             });
-        }
-    });
+        } });
 
-    //接收方处理语音请求
-    connect(client,&TcpClient::messageReceived,[this](const Packege& send_Pkg){
+    // 接收方处理语音请求
+    connect(client, &TcpClient::messageReceived, [this](const Packege &send_Pkg)
+            {
         if(send_Pkg.type!=AUDIO_SIGNALING_MESSAGE_SEND) return;
         //弹出信令窗口
-        voiceSignalingDialog(send_Pkg);
-    });
+        voiceSignalingDialog(send_Pkg); });
 
     return topNavigationToolBar;
 }
 
 QToolBar *SpecificChatWindow::createbottomToolBar()
 {
-    QToolBar* bottomActionToolBar=new QToolBar;
-    //Emoji, Screenshot, Send File, Send Image, Voice Message
-    //设置组件并添加
-    QAction* emoji = new QAction(QIcon(":/resource/image/emoji.png"),"",this);
-    QAction* screenShot = new QAction(QIcon(":/resource/image/screenShot.png"),"",this);
-    QAction* sendFile = new QAction(QIcon(":/resource/image/sendFile.png"),"",this);
-    QAction* sendImage = new QAction(QIcon(":/resource/image/sendImage.png"),"",this);
-    QAction* voiceMessage = new QAction(QIcon(":/resource/image/voiceMessage.png"),"",this);
-    QAction* chatRecord = new QAction(QIcon(":/resource/image/chatRecord.png"),"",this);
+    QToolBar *bottomActionToolBar = new QToolBar;
+    // Emoji, Screenshot, Send File, Send Image, Voice Message
+    // 设置组件并添加
+    QAction *emoji = new QAction(QIcon(":/resource/image/emoji.png"), "", this);
+    QAction *screenShot = new QAction(QIcon(":/resource/image/screenShot.png"), "", this);
+    QAction *sendFile = new QAction(QIcon(":/resource/image/sendFile.png"), "", this);
+    QAction *sendImage = new QAction(QIcon(":/resource/image/sendImage.png"), "", this);
+    QAction *voiceMessage = new QAction(QIcon(":/resource/image/voiceMessage.png"), "", this);
+    QAction *chatRecord = new QAction(QIcon(":/resource/image/chatRecord.png"), "", this);
 
     bottomActionToolBar->addAction(emoji);
     bottomActionToolBar->addAction(screenShot);
@@ -406,14 +397,14 @@ QToolBar *SpecificChatWindow::createbottomToolBar()
     bottomActionToolBar->addAction(sendImage);
     bottomActionToolBar->addAction(voiceMessage);
 
-    //加弹簧
+    // 加弹簧
     QWidget *spring = new QWidget(this);
     spring->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     bottomActionToolBar->addWidget(spring);
 
     bottomActionToolBar->addAction(chatRecord);
 
-    //设置提示词
+    // 设置提示词
     emoji->setToolTip("表情");
     screenShot->setToolTip("截图");
     sendFile->setToolTip("发送文件");
@@ -422,7 +413,8 @@ QToolBar *SpecificChatWindow::createbottomToolBar()
     chatRecord->setToolTip("聊天记录");
 
     // SpecificChatWindow.cpp - inputWindow() 函数中的表情按钮连接
-    connect(emoji,&QAction::triggered,[this, emoji](){
+    connect(emoji, &QAction::triggered, [this, emoji]()
+            {
         if (emojiMgr->isVisible())
         {
             emojiMgr->hide();
@@ -444,75 +436,72 @@ QToolBar *SpecificChatWindow::createbottomToolBar()
             // 设置位置：左侧对齐聊天列表，顶部贴输入框上方
             emojiMgr->move(listLeft.x(), inputTop.y() - emojiMgr->height());
             emojiMgr->show();
-        }
-    });
-    connect(sendFile,&QAction::triggered,this,&SpecificChatWindow::sendFileFunction);
-    connect(sendImage,&QAction::triggered,this,&SpecificChatWindow::sendImageFunction);
+        } });
+    connect(sendFile, &QAction::triggered, this, &SpecificChatWindow::sendFileFunction);
+    connect(sendImage, &QAction::triggered, this, &SpecificChatWindow::sendImageFunction);
 
     return bottomActionToolBar;
 }
 
-
 /***********************************************************************************************
-*                               小组件功能模块的实现                                              *
-*                                 1.文件传输                                                    *
-*                                 2.图片功能                                                    *
-*                                 2.文本图片传输                                                 *
-*                                 3.文件接收与存储                                               *
-*                                 4.视频通话                                                    *
-*                                 5.语音通话                                                    *
-***********************************************************************************************/
+ *                               小组件功能模块的实现                                              *
+ *                                 1.文件传输                                                    *
+ *                                 2.图片功能                                                    *
+ *                                 2.文本图片传输                                                 *
+ *                                 3.文件接收与存储                                               *
+ *                                 4.视频通话                                                    *
+ *                                 5.语音通话                                                    *
+ ***********************************************************************************************/
 void SpecificChatWindow::sendFileFunction()
 {
-    //获取文件路径
-    QStringList filePaths=QFileDialog::getOpenFileNames(this,"选择文件","D:/","所有文件(*.*)");
-    if(!filePaths.isEmpty())
+    // 获取文件路径
+    QStringList filePaths = QFileDialog::getOpenFileNames(this, "选择文件", "D:/", "所有文件(*.*)");
+    if (!filePaths.isEmpty())
     {
-        //弹出窗口
+        // 弹出窗口
         fileSendDialog(filePaths);
     }
     else
     {
-        qDebug()<<"未选择文件";
+        qDebug() << "未选择文件";
     }
 }
 
-void SpecificChatWindow::fileSendDialog(const QStringList& filePaths)
+void SpecificChatWindow::fileSendDialog(const QStringList &filePaths)
 {
-    QDialog* dlog=new QDialog(this);
+    QDialog *dlog = new QDialog(this);
 
-
-    //创建布局
-    auto hLayout=new QHBoxLayout;
-    auto sendBtn=new QPushButton("发送",dlog);
-    auto cancelBtn=new QPushButton("取消",dlog);
+    // 创建布局
+    auto hLayout = new QHBoxLayout;
+    auto sendBtn = new QPushButton("发送", dlog);
+    auto cancelBtn = new QPushButton("取消", dlog);
     hLayout->addWidget(sendBtn);
     hLayout->addWidget(cancelBtn);
 
-    //创建布局
-    auto vLayout=new QVBoxLayout;
-    //创建标题栏
-    QLabel* titleLabel=new QLabel("发送给醉酒梦月",dlog);
-    //创建视图列表
-    auto listView=new QListView(dlog);
+    // 创建布局
+    auto vLayout = new QVBoxLayout;
+    // 创建标题栏
+    QLabel *titleLabel = new QLabel("发送给醉酒梦月", dlog);
+    // 创建视图列表
+    auto listView = new QListView(dlog);
     listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     listView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    auto model=new QStandardItemModel(dlog);
+    auto model = new QStandardItemModel(dlog);
     listView->setModel(model);
 
-    for(const QString& path:filePaths)
+    for (const QString &path : filePaths)
     {
         QFileInfo fileInfo(path);
-        QString fileName=fileInfo.fileName();
-        QString fileType=fileInfo.suffix().toLower();
-        QStandardItem* item=new QStandardItem(
-            QIcon(":/resource/image/fileType/"+fileType+".png"),//添加文件图标
-            fileName+"\n"+
-            QString::number(fileInfo.size()/1024)+" KB");//显示文件大小
+        QString fileName = fileInfo.fileName();
+        QString fileType = fileInfo.suffix().toLower();
+        QStandardItem *item = new QStandardItem(
+            QIcon(":/resource/image/fileType/" + fileType + ".png"), // 添加文件图标
+            fileName + "\n" +
+                QString::number(fileInfo.size() / 1024) + " KB"); // 显示文件大小
         model->appendRow(item);
     }
 
-    //将视图添加进布局
+    // 将视图添加进布局
     vLayout->addWidget(titleLabel);
     vLayout->addWidget(listView);
     vLayout->addLayout(hLayout);
@@ -520,8 +509,9 @@ void SpecificChatWindow::fileSendDialog(const QStringList& filePaths)
     dlog->setLayout(vLayout);
     dlog->show();
 
-    //发送消息
-    connect(sendBtn,&QPushButton::clicked,[this,dlog,filePaths](){ 
+    // 发送消息
+    connect(sendBtn, &QPushButton::clicked, [this, dlog, filePaths]()
+            { 
         // 预处理：收集零大小文件
         QStringList zeroSizeFiles;
         for(const QString& path:filePaths)
@@ -592,24 +582,23 @@ void SpecificChatWindow::fileSendDialog(const QStringList& filePaths)
             QString warningMsg = "以下文件大小为零，已跳过：\n";
             warningMsg += zeroSizeFiles.join("\n"); // 合并所有文件名
             QMessageBox::warning(this, "警告", warningMsg);
-        }
-    });
-    //取消,关闭对话框
-    connect(cancelBtn,&QPushButton::clicked,dlog,&QDialog::reject);
+        } });
+    // 取消,关闭对话框
+    connect(cancelBtn, &QPushButton::clicked, dlog, &QDialog::reject);
 }
 
 void SpecificChatWindow::sendImageFunction()
 {
-    //获取图片路径
-    QStringList imagePaths=QFileDialog::getOpenFileNames(
-        this,"选择图片","D:/","图片(*gif;*png;*jpg;*jpeg;*.webp;*avif;*.bmp;*sharpp;*.apng)");
-    if(!imagePaths.isEmpty())
+    // 获取图片路径
+    QStringList imagePaths = QFileDialog::getOpenFileNames(
+        this, "选择图片", "D:/", "图片(*gif;*png;*jpg;*jpeg;*.webp;*avif;*.bmp;*sharpp;*.apng)");
+    if (!imagePaths.isEmpty())
     {
         emit imageSelectionCompleted(imagePaths);
     }
     else
     {
-        qDebug()<<"未选择图片";
+        qDebug() << "未选择图片";
     }
 }
 
@@ -621,15 +610,19 @@ QVector<Image> SpecificChatWindow::extractImagesFromHtml(QString &html)
     doc.setHtml(html);
 
     QTextBlock block = doc.begin();
-    while (block.isValid()) {
+    while (block.isValid())
+    {
         QTextBlock::iterator it;
-        for (it = block.begin(); !it.atEnd(); ++it) {
+        for (it = block.begin(); !it.atEnd(); ++it)
+        {
             QTextFragment fragment = it.fragment();
-            if (fragment.charFormat().isImageFormat()) {
+            if (fragment.charFormat().isImageFormat())
+            {
                 QTextImageFormat format = fragment.charFormat().toImageFormat();
                 QString imagePath = format.name();
 
-                if (imagePath.startsWith(":/resource/image/emojis/")) {
+                if (imagePath.startsWith(":/resource/image/emojis/"))
+                {
                     continue; // 不处理表情包
                 }
 
@@ -660,15 +653,14 @@ QVector<Image> SpecificChatWindow::extractImagesFromHtml(QString &html)
 void SpecificChatWindow::generateLocalImageUrls(const Packege &resend_Pkg)
 {
     // 将图片保存到本地,返回url
-    Packege url_Pkg=resend_Pkg;
-    url_Pkg.messageInfo.images=localBase->local_MediaTable_Create_MediaRecord(resend_Pkg); // 将图片保存到本地数据库
+    Packege url_Pkg = resend_Pkg;
+    url_Pkg.messageInfo.images = localBase->local_MediaTable_Create_MediaRecord(resend_Pkg); // 将图片保存到本地数据库
     // 生成富文本
-    url_Pkg.messageInfo.richText=generateRichTextInfo(url_Pkg);
+    url_Pkg.messageInfo.richText = generateRichTextInfo(url_Pkg);
     localBase->local_ChrTable_Create_ChatRecord(url_Pkg); // 将富文本保存到本地数据库
 
     // 更新最新消息
-    QString account = fullPkg.sender != qApp->property("username").toString() ?
-                          fullPkg.sender : fullPkg.receiver;
+    QString account = fullPkg.sender != qApp->property("username").toString() ? fullPkg.sender : fullPkg.receiver;
     emit chatListMessageUpdated(account);
 
     emit imageUrlsGenerated(url_Pkg);
@@ -678,10 +670,11 @@ QString SpecificChatWindow::generateRichTextInfo(const Packege &url_Pkg)
 {
     // 获取当前富文本（带占位符）
     QString html = url_Pkg.messageInfo.richText;
-    QVector<Image> images=url_Pkg.messageInfo.images;
-    for (int i = 0; i < images.size(); ++i) {
+    QVector<Image> images = url_Pkg.messageInfo.images;
+    for (int i = 0; i < images.size(); ++i)
+    {
         QString placeholder = QString("IMG_PLACEHOLDER_%1")
-        .arg(images[i].uniqueId);
+                                  .arg(images[i].uniqueId);
 
         html.replace(placeholder, images[i].url);
     }
@@ -689,32 +682,29 @@ QString SpecificChatWindow::generateRichTextInfo(const Packege &url_Pkg)
     return html;
 }
 
-
-void SpecificChatWindow::addMessage(const Packege& fullPkg)
+void SpecificChatWindow::addMessage(const Packege &fullPkg)
 {
-    QString account=fullPkg.sender==qApp->property("username").toString()?fullPkg.receiver:fullPkg.sender;
+    QString account = fullPkg.sender == qApp->property("username").toString() ? fullPkg.receiver : fullPkg.sender;
     if (!userChatSplitters.contains(account))
     {
         OpenChatWidget(account);
     }
 
-
     // 从 splitter 中获取 QListWidget
-    QSplitter* splitter = userChatSplitters[account];
-    QListWidget* chatListWidget = qobject_cast<QListWidget*>(splitter->widget(0));
+    QSplitter *splitter = userChatSplitters[account];
+    QListWidget *chatListWidget = qobject_cast<QListWidget *>(splitter->widget(0));
 
-
-    QListWidgetItem* item=new QListWidgetItem(chatListWidget);
-    BubbleWidget* bubble=new BubbleWidget(fullPkg);
+    QListWidgetItem *item = new QListWidgetItem(chatListWidget);
+    BubbleWidget *bubble = new BubbleWidget(fullPkg);
 
     // 存储文件内容和文件名到本地
-    int message_Type=fullPkg.messageInfo.message_type;
-    if(message_Type==BLOCK_FILE_TRANSFERS)
+    int message_Type = fullPkg.messageInfo.message_type;
+    if (message_Type == BLOCK_FILE_TRANSFERS)
     {
-        QString fileID=fullPkg.messageInfo.file.fileID;
-        QByteArray fullData=fullPkg.messageInfo.file.fileContent;
-        QString fileName=fullPkg.messageInfo.file.fileName;
-        receivedFiles[fileID]={fullData,fileName};
+        QString fileID = fullPkg.messageInfo.file.fileID;
+        QByteArray fullData = fullPkg.messageInfo.file.fileContent;
+        QString fileName = fullPkg.messageInfo.file.fileName;
+        receivedFiles[fileID] = {fullData, fileName};
     }
 
     // 设置列表项大小
@@ -722,9 +712,9 @@ void SpecificChatWindow::addMessage(const Packege& fullPkg)
 
     // 添加项到列表
     chatListWidget->addItem(item);
-    chatListWidget->setItemWidget(item,bubble);
+    chatListWidget->setItemWidget(item, bubble);
 
-    //自动滚动到底部
+    // 自动滚动到底部
     chatListWidget->scrollToBottom();
 
     // 文件下载与打开
@@ -736,47 +726,47 @@ void SpecificChatWindow::addMessage(const Packege& fullPkg)
 
 void SpecificChatWindow::processFilePackage(const Packege &unit_Pkg)
 {
-    //是否接收完整
-    bool isTransferComplete=0;
+    // 是否接收完整
+    bool isTransferComplete = 0;
 
-    const QString fileID=unit_Pkg.messageInfo.file.fileID;
-    if(unit_Pkg.messageInfo.file.currentBlock==0)
+    const QString fileID = unit_Pkg.messageInfo.file.fileID;
+    if (unit_Pkg.messageInfo.file.currentBlock == 0)
     {
-        activePackege[unit_Pkg.messageInfo.file.fileID]=unit_Pkg;
-        activePackege[fileID].messageInfo.file.receivedBlocks=0;
+        activePackege[unit_Pkg.messageInfo.file.fileID] = unit_Pkg;
+        activePackege[fileID].messageInfo.file.receivedBlocks = 0;
         activePackege[fileID].messageInfo.file.blocks.clear(); // 显式初始化
-        activePackege[fileID].messageInfo.sender_del=unit_Pkg.messageInfo.sender_del;
-        activePackege[fileID].messageInfo.receiver_del=unit_Pkg.messageInfo.receiver_del;
+        activePackege[fileID].messageInfo.sender_del = unit_Pkg.messageInfo.sender_del;
+        activePackege[fileID].messageInfo.receiver_del = unit_Pkg.messageInfo.receiver_del;
     }
     else
     {
-        const int currentBlock=unit_Pkg.messageInfo.file.currentBlock;
-        activePackege[fileID].messageInfo.file.blocks[currentBlock]=
+        const int currentBlock = unit_Pkg.messageInfo.file.currentBlock;
+        activePackege[fileID].messageInfo.file.blocks[currentBlock] =
             unit_Pkg.messageInfo.file.fileContent;
-        int receiveBlocks=++activePackege[fileID].messageInfo.file.receivedBlocks;
-        int totalBlocks=activePackege[fileID].messageInfo.file.totalBlocks;
+        int receiveBlocks = ++activePackege[fileID].messageInfo.file.receivedBlocks;
+        int totalBlocks = activePackege[fileID].messageInfo.file.totalBlocks;
 
-        if(receiveBlocks==totalBlocks)
+        if (receiveBlocks == totalBlocks)
         {
             // 按序号合并块
             QByteArray fullData;
-            for(int blockIndex=1;blockIndex<=totalBlocks;blockIndex++)
+            for (int blockIndex = 1; blockIndex <= totalBlocks; blockIndex++)
             {
-                QByteArray currentData=activePackege[fileID].messageInfo.file.blocks[blockIndex];
-                fullData+=currentData;
+                QByteArray currentData = activePackege[fileID].messageInfo.file.blocks[blockIndex];
+                fullData += currentData;
             }
 
-            QString fileName=activePackege[fileID].messageInfo.file.fileName;
-            int totalSize=activePackege[fileID].messageInfo.file.fileSize;
+            QString fileName = activePackege[fileID].messageInfo.file.fileName;
+            int totalSize = activePackege[fileID].messageInfo.file.fileSize;
 
-            if(fullData.size()==totalSize)
+            if (fullData.size() == totalSize)
             {
-                fullPkg=activePackege[fileID];
-                fullPkg.messageInfo.file.fileContent=fullData;
+                fullPkg = activePackege[fileID];
+                fullPkg.messageInfo.file.fileContent = fullData;
                 // 资源释放
                 activePackege[fileID].messageInfo.file.blocks.clear();
                 activePackege.remove(fileID);
-                isTransferComplete=1;
+                isTransferComplete = 1;
             }
             else
             {
@@ -786,21 +776,20 @@ void SpecificChatWindow::processFilePackage(const Packege &unit_Pkg)
         }
     }
 
-    //文件完整后放行
-    if(isTransferComplete)
+    // 文件完整后放行
+    if (isTransferComplete)
     {
-        if(fullPkg.type==SEND_FILE_MESSAGE||fullPkg.type==LOAD_CHATHISTORY)
+        if (fullPkg.type == SEND_FILE_MESSAGE || fullPkg.type == LOAD_CHATHISTORY)
         {
             addMessage(fullPkg);
         }
-        if(fullPkg.type==SEND_FILE_MESSAGE||fullPkg.type==ASYNC_FETCH_CHATHISTORY)
+        if (fullPkg.type == SEND_FILE_MESSAGE || fullPkg.type == ASYNC_FETCH_CHATHISTORY)
         {
             // 存储文件消息到本地数据库
             localBase->local_ChrTable_Create_ChatRecord(fullPkg);
 
             // 更新最新消息
-            QString account = fullPkg.sender != qApp->property("username").toString() ?
-                                  fullPkg.sender : fullPkg.receiver;
+            QString account = fullPkg.sender != qApp->property("username").toString() ? fullPkg.sender : fullPkg.receiver;
             emit chatListMessageUpdated(account);
         }
     }
@@ -808,30 +797,32 @@ void SpecificChatWindow::processFilePackage(const Packege &unit_Pkg)
 
 void SpecificChatWindow::handleIncomingPeerRichTextMessage(const Packege &resend_Pkg)
 {
-    if(resend_Pkg.type!=SEND_RICHTEXT_MESSAGE) return;
+    if (resend_Pkg.type != SEND_RICHTEXT_MESSAGE)
+        return;
 
     generateLocalImageUrls(resend_Pkg);
 }
 
 // 处理对方发来的消息
-void SpecificChatWindow::handleIncomingPeerFileMessage(const Packege& resend_Pkg)
+void SpecificChatWindow::handleIncomingPeerFileMessage(const Packege &resend_Pkg)
 {
-    if(resend_Pkg.type!=SEND_FILE_MESSAGE) return;
+    if (resend_Pkg.type != SEND_FILE_MESSAGE)
+        return;
 
     processFilePackage(resend_Pkg);
 }
 
-void SpecificChatWindow::loadLocalChatHistory(const QString& peerUser)
+void SpecificChatWindow::loadLocalChatHistory(const QString &peerUser)
 {
-    QVector<Packege> chatHistory_Pkgs=localBase->local_ChrTable_Load_ChatHistory(peerUser);
-    for(auto chatHistory_Pkg:chatHistory_Pkgs)
+    QVector<Packege> chatHistory_Pkgs = localBase->local_ChrTable_Load_ChatHistory(peerUser);
+    for (auto chatHistory_Pkg : chatHistory_Pkgs)
     {
-        if(chatHistory_Pkg.messageInfo.message_type==RICHTEXTCONTENT_TRANSFERS)
+        if (chatHistory_Pkg.messageInfo.message_type == RICHTEXTCONTENT_TRANSFERS)
         {
             // 显示图片
             addMessage(chatHistory_Pkg);
         }
-        else if(chatHistory_Pkg.messageInfo.message_type==BLOCK_FILE_TRANSFERS)
+        else if (chatHistory_Pkg.messageInfo.message_type == BLOCK_FILE_TRANSFERS)
         {
             // 合并块，并显示
             processFilePackage(chatHistory_Pkg);
@@ -841,26 +832,28 @@ void SpecificChatWindow::loadLocalChatHistory(const QString& peerUser)
 
 void SpecificChatWindow::handleServerChatHistoryResp(const Packege &chatSyncPkg)
 {
-    if(chatSyncPkg.type!=ASYNC_FETCH_CHATHISTORY) return;
+    if (chatSyncPkg.type != ASYNC_FETCH_CHATHISTORY)
+        return;
 
-    int message_type=chatSyncPkg.messageInfo.message_type;
-    switch(message_type)
+    int message_type = chatSyncPkg.messageInfo.message_type;
+    switch (message_type)
     {
     case RICHTEXTCONTENT_TRANSFERS:
         generateLocalImageUrls(chatSyncPkg);
-    break;
+        break;
     case BLOCK_FILE_TRANSFERS:
         processFilePackage(chatSyncPkg);
-    break;
+        break;
     default:
-        qDebug()<<"message_type on handleServerChatHistoryResp is None!";
-    break;
+        qDebug() << "message_type on handleServerChatHistoryResp is None!";
+        break;
     }
 }
 
 void SpecificChatWindow::handleDownloadRequest(const QString &fileID)
 {
-    if (!receivedFiles.contains(fileID)) {
+    if (!receivedFiles.contains(fileID))
+    {
         qDebug() << "文件不存在或已过期";
         return;
     }
@@ -872,7 +865,7 @@ void SpecificChatWindow::handleDownloadRequest(const QString &fileID)
     {
         // 获取文件名
         QString fileName = receivedFiles[fileID].fileName;
-        //拼凑完整路径
+        // 拼凑完整路径
         QString filePath = QDir(downloadPath).filePath(fileName);
         QFile file(filePath);
         if (file.open(QIODevice::WriteOnly))
@@ -921,14 +914,14 @@ void SpecificChatWindow::handleOpenFolder(const QString &fileID)
     }
 }
 
-void SpecificChatWindow::videoSignalingDialog(const Packege& send_Pkg)
+void SpecificChatWindow::videoSignalingDialog(const Packege &send_Pkg)
 {
-    videoSignalingDlg=new QDialog(this);
+    videoSignalingDlg = new QDialog(this);
 
-    QHBoxLayout* hLayout = new QHBoxLayout(videoSignalingDlg);
-    QLabel* call_Display_Label = new QLabel("来电");
-    QPushButton* acceptButton = new QPushButton(QIcon(),"接受");
-    QPushButton* closeButton = new QPushButton(QIcon(),"拒绝");
+    QHBoxLayout *hLayout = new QHBoxLayout(videoSignalingDlg);
+    QLabel *call_Display_Label = new QLabel("来电");
+    QPushButton *acceptButton = new QPushButton(QIcon(), "接受");
+    QPushButton *closeButton = new QPushButton(QIcon(), "拒绝");
 
     hLayout->addWidget(call_Display_Label);
     hLayout->addWidget(acceptButton);
@@ -937,42 +930,41 @@ void SpecificChatWindow::videoSignalingDialog(const Packege& send_Pkg)
     videoSignalingDlg->setLayout(hLayout);
     videoSignalingDlg->show();
 
+    connect(acceptButton, &QPushButton::clicked, [this, send_Pkg]()
+            {
+                videoSignalingDlg->accept();
 
-    connect(acceptButton,&QPushButton::clicked,[this,send_Pkg](){
-        videoSignalingDlg->accept();
+                // 先初始化
+                videoReceiver = new VideoReceiver(this);
+                videoSender = new VideoSender(this);
 
-        // 先初始化
-        videoReceiver = new VideoReceiver(this);
-        videoSender = new VideoSender(this);
+                audioReceiver = new AudioReceiver(this);
+                audioSender = new AudioSender(this);
 
-        audioReceiver = new AudioReceiver(this);
-        audioSender = new AudioSender(this);
+                // 再显示视频对话框
+                videoCallDialog();
 
-        // 再显示视频对话框
-        videoCallDialog();
+                {
+                    // 1. 通过信令返回网络信息
+                    Packege resend_Pkg;
+                    resend_Pkg.type = VIDEO_SIGNALING_MESSAGE_RECEIVER;
+                    resend_Pkg.sender = send_Pkg.sender;
+                    resend_Pkg.receiver = send_Pkg.receiver;
+                    resend_Pkg.videoPort = videoReceiver->getLocalBindPort();
+                    resend_Pkg.audioPort = audioReceiver->getLocalBindPort();
 
-        {
-            // 1. 通过信令返回网络信息
-            Packege resend_Pkg;
-            resend_Pkg.type=VIDEO_SIGNALING_MESSAGE_RECEIVER;
-            resend_Pkg.sender=send_Pkg.sender;
-            resend_Pkg.receiver=send_Pkg.receiver;
-            resend_Pkg.videoPort=videoReceiver->getLocalBindPort();
-            resend_Pkg.audioPort=audioReceiver->getLocalBindPort();
+                    client->sendMessage(resend_Pkg);
 
-            client->sendMessage(resend_Pkg);
+                    // 2. 启动本地摄像头和麦克风，给对方发送udp数据包
+                    videoSender->updateConnectedIpPort(send_Pkg.ip, send_Pkg.videoPort);
+                    videoSender->startCapture();
 
-            // 2. 启动本地摄像头和麦克风，给对方发送udp数据包
-            videoSender->updateConnectedIpPort(send_Pkg.ip, send_Pkg.videoPort);
-            videoSender->startCapture();
+                    audioSender->updateConnectedIpPort(send_Pkg.ip, send_Pkg.audioPort);
+                    audioSender->startBroadcast();
+                } });
 
-            audioSender->updateConnectedIpPort(send_Pkg.ip, send_Pkg.audioPort);
-            audioSender->startBroadcast();
-        }
-
-    });
-
-    connect(closeButton,&QPushButton::clicked,[this,send_Pkg](){
+    connect(closeButton, &QPushButton::clicked, [this, send_Pkg]()
+            {
         videoSignalingDlg->close();
 
         // 拒绝视频对话,关闭发送方的聊天窗口
@@ -983,18 +975,17 @@ void SpecificChatWindow::videoSignalingDialog(const Packege& send_Pkg)
         resend_Pkg.videoPort=0;
         resend_Pkg.audioPort=0;
 
-        client->sendMessage(resend_Pkg);
-    });
+        client->sendMessage(resend_Pkg); });
 }
 
 void SpecificChatWindow::voiceSignalingDialog(const Packege &send_Pkg)
 {
-    voiceSignalingDlg=new QDialog(this);
+    voiceSignalingDlg = new QDialog(this);
 
-    QHBoxLayout* hLayout = new QHBoxLayout(voiceSignalingDlg);
-    QLabel* call_Display_Label = new QLabel("来电");
-    QPushButton* acceptButton = new QPushButton(QIcon(),"接受");
-    QPushButton* closeButton = new QPushButton(QIcon(),"拒绝");
+    QHBoxLayout *hLayout = new QHBoxLayout(voiceSignalingDlg);
+    QLabel *call_Display_Label = new QLabel("来电");
+    QPushButton *acceptButton = new QPushButton(QIcon(), "接受");
+    QPushButton *closeButton = new QPushButton(QIcon(), "拒绝");
 
     hLayout->addWidget(call_Display_Label);
     hLayout->addWidget(acceptButton);
@@ -1003,33 +994,32 @@ void SpecificChatWindow::voiceSignalingDialog(const Packege &send_Pkg)
     voiceSignalingDlg->setLayout(hLayout);
     voiceSignalingDlg->show();
 
+    connect(acceptButton, &QPushButton::clicked, [this, send_Pkg]()
+            {
+                voiceSignalingDlg->accept();
+                voiceCallDialog();
 
-    connect(acceptButton,&QPushButton::clicked,[this,send_Pkg](){
-        voiceSignalingDlg->accept();
-        voiceCallDialog();
+                // 初始化
+                audioReceiver = new AudioReceiver(this);
+                audioSender = new AudioSender(this);
 
-        //初始化
-        audioReceiver = new AudioReceiver(this);
-        audioSender = new AudioSender(this);
+                {
+                    // 1. 通过信令返回网络信息
+                    Packege resend_Pkg;
+                    resend_Pkg.type = AUDIO_SIGNALING_MESSAGE_RECEIVER;
+                    resend_Pkg.sender = send_Pkg.sender;
+                    resend_Pkg.receiver = send_Pkg.receiver;
+                    resend_Pkg.audioPort = audioReceiver->getLocalBindPort();
 
-        {
-            // 1. 通过信令返回网络信息
-            Packege resend_Pkg;
-            resend_Pkg.type=AUDIO_SIGNALING_MESSAGE_RECEIVER;
-            resend_Pkg.sender=send_Pkg.sender;
-            resend_Pkg.receiver=send_Pkg.receiver;
-            resend_Pkg.audioPort=audioReceiver->getLocalBindPort();
+                    client->sendMessage(resend_Pkg);
 
-            client->sendMessage(resend_Pkg);
+                    // 2. 启动本地麦克风，给对方发送udp数据包
+                    audioSender->updateConnectedIpPort(send_Pkg.ip, send_Pkg.audioPort);
+                    audioSender->startBroadcast();
+                } });
 
-            // 2. 启动本地麦克风，给对方发送udp数据包
-            audioSender->updateConnectedIpPort(send_Pkg.ip, send_Pkg.audioPort);
-            audioSender->startBroadcast();
-        }
-
-    });
-
-    connect(closeButton,&QPushButton::clicked,[this,send_Pkg](){
+    connect(closeButton, &QPushButton::clicked, [this, send_Pkg]()
+            {
         voiceSignalingDlg->close();
 
         // 拒绝语音对话,关闭发送方的聊天窗口
@@ -1039,8 +1029,7 @@ void SpecificChatWindow::voiceSignalingDialog(const Packege &send_Pkg)
         resend_Pkg.receiver=send_Pkg.receiver;
         resend_Pkg.audioPort=0;
 
-        client->sendMessage(resend_Pkg);
-    });
+        client->sendMessage(resend_Pkg); });
 }
 
 void SpecificChatWindow::videoCallDialog()
@@ -1049,15 +1038,15 @@ void SpecificChatWindow::videoCallDialog()
     videoDlg = new QDialog;
     videoDlg->show();
 
-    //布局
-    QVBoxLayout* vedioVlayout = new QVBoxLayout(videoDlg);
+    // 布局
+    QVBoxLayout *vedioVlayout = new QVBoxLayout(videoDlg);
 
-    QLabel* videoLabel=new QLabel;
+    QLabel *videoLabel = new QLabel;
 
-    QHBoxLayout* hLayout = new QHBoxLayout;
-    QPushButton* recordButton = new QPushButton("录音");
-    QPushButton* acceptButton = new QPushButton("同意");
-    QPushButton* closeButton = new QPushButton("拒绝");
+    QHBoxLayout *hLayout = new QHBoxLayout;
+    QPushButton *recordButton = new QPushButton("录音");
+    QPushButton *acceptButton = new QPushButton("同意");
+    QPushButton *closeButton = new QPushButton("拒绝");
     hLayout->addWidget(recordButton);
     hLayout->addWidget(acceptButton);
     hLayout->addWidget(closeButton);
@@ -1067,11 +1056,11 @@ void SpecificChatWindow::videoCallDialog()
     videoDlg->setLayout(vedioVlayout);
 
     // 连接信号槽（跨线程安全）
-    connect(videoReceiver, &VideoReceiver::frameReceived, this, [=](const QImage &image) {
+    connect(videoReceiver, &VideoReceiver::frameReceived, this, [=](const QImage &image)
+            {
         // 转换图像格式为 RGB32
         QImage rgbImage = image.convertToFormat(QImage::Format_RGB32);
-        videoLabel->setPixmap(QPixmap::fromImage(rgbImage.scaled(640, 480)));
-    }, Qt::QueuedConnection); // 确保在主线程更新 UI
+        videoLabel->setPixmap(QPixmap::fromImage(rgbImage.scaled(640, 480))); }, Qt::QueuedConnection); // 确保在主线程更新 UI
 }
 
 void SpecificChatWindow::voiceCallDialog()
@@ -1080,20 +1069,20 @@ void SpecificChatWindow::voiceCallDialog()
     audioDlg = new QDialog;
     audioDlg->show();
 
-    //布局
-    QVBoxLayout* audio_Vlayout = new QVBoxLayout(this);
+    // 布局
+    QVBoxLayout *audio_Vlayout = new QVBoxLayout(this);
 
-    //设置占位图片
-    QLabel* audio_Label = new QLabel;
+    // 设置占位图片
+    QLabel *audio_Label = new QLabel;
     const QString placeholderPath = ".png";
-    if(QFile::exists(placeholderPath))
+    if (QFile::exists(placeholderPath))
     {
         audio_Label->setPixmap(QPixmap(placeholderPath));
     }
 
-    QHBoxLayout* audio_Hlayout = new QHBoxLayout;
-    QPushButton* recordButton = new QPushButton(QIcon(),"录音");
-    QPushButton* closeButton = new QPushButton(QIcon(),"关闭");
+    QHBoxLayout *audio_Hlayout = new QHBoxLayout;
+    QPushButton *recordButton = new QPushButton(QIcon(), "录音");
+    QPushButton *closeButton = new QPushButton(QIcon(), "关闭");
     audio_Hlayout->addWidget(recordButton);
     audio_Hlayout->addWidget(closeButton);
 
@@ -1101,10 +1090,8 @@ void SpecificChatWindow::voiceCallDialog()
     audio_Vlayout->addLayout(audio_Hlayout);
     audioDlg->setLayout(audio_Vlayout);
 
-    connect(closeButton,&QPushButton::clicked,audioDlg,&QDialog::rejected);
+    connect(closeButton, &QPushButton::clicked, audioDlg, &QDialog::rejected);
 }
-
-
 
 /*
 void SpecificChatWindow::deleteMessage(const QString &id)
@@ -1139,4 +1126,3 @@ void SpecificChatWindow::deleteMessage(const QString &id)
     }
 }
 */
-

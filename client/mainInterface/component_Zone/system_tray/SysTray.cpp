@@ -59,7 +59,8 @@ void SysTray::createMenu()
 
 void SysTray::onTrayActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    if(reason == QSystemTrayIcon::DoubleClick) {
+    if (reason == QSystemTrayIcon::DoubleClick)
+    {
         emit restoreRequested();
     }
 }

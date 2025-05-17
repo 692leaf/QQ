@@ -10,7 +10,7 @@ class EmojiUnicodeMapper : public QObject
 public:
     explicit EmojiUnicodeMapper(QObject *parent = nullptr);
     void emoji_Unicode_Mapping();
-    QString get_Unicode(const QString& emojiName);
+    QString get_Unicode(const QString &emojiName);
 
 private:
     // 存储表情到 Unicode 编码的映射

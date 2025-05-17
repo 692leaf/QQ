@@ -23,7 +23,6 @@ private slots:
 private:
     QUdpSocket *udpSocket;
     quint16 localListenPort = 0; // 初始化为0，动态分配
-
 };
 
 #endif // VIDEORECEIVER_H

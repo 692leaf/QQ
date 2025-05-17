@@ -3,37 +3,36 @@
 #include <QApplication>
 #include <QRegularExpression>
 
-BubbleWidget::BubbleWidget(const Packege& fullPkg,QWidget *parent)
+BubbleWidget::BubbleWidget(const Packege &fullPkg, QWidget *parent)
     : QWidget{parent}
 {
     setupUI(fullPkg);
 }
 
-void BubbleWidget::setupUI(const Packege& fullPkg)
+void BubbleWidget::setupUI(const Packege &fullPkg)
 {
-    bool isSelfMessage=fullPkg.sender==qApp->property("username").toString();
+    bool isSelfMessage = fullPkg.sender == qApp->property("username").toString();
 
     QString messageHtml;
-    if(fullPkg.messageInfo.message_type==RICHTEXTCONTENT_TRANSFERS)
+    if (fullPkg.messageInfo.message_type == RICHTEXTCONTENT_TRANSFERS)
     {
-        messageHtml=generateTextMessageHtml(fullPkg);
+        messageHtml = generateTextMessageHtml(fullPkg);
     }
-    else if(fullPkg.messageInfo.message_type==BLOCK_FILE_TRANSFERS)
+    else if (fullPkg.messageInfo.message_type == BLOCK_FILE_TRANSFERS)
     {
-        messageHtml=generateFileMessageHtml(fullPkg);
+        messageHtml = generateFileMessageHtml(fullPkg);
     }
     else
     {
-        qDebug()<<"bublleWdidget type: NONE";
+        qDebug() << "bublleWdidget type: NONE";
     }
 
     QLabel *msgLabel = new QLabel(messageHtml, this);
-    msgLabel->setWordWrap(true);                                    // 自动换行
-    msgLabel->setTextFormat(Qt::RichText);                          // 启用富文本
-    msgLabel->setTextInteractionFlags(Qt::LinksAccessibleByMouse);  // 允许鼠标点击链接
-    msgLabel->setOpenExternalLinks(false);                          // 禁用自动打开外部链接
-    msgLabel->setWordWrap(true);                                    // 允许自动换行
-
+    msgLabel->setWordWrap(true);                                   // 自动换行
+    msgLabel->setTextFormat(Qt::RichText);                         // 启用富文本
+    msgLabel->setTextInteractionFlags(Qt::LinksAccessibleByMouse); // 允许鼠标点击链接
+    msgLabel->setOpenExternalLinks(false);                         // 禁用自动打开外部链接
+    msgLabel->setWordWrap(true);                                   // 允许自动换行
 
     // ===== 布局管理 =====
     QHBoxLayout *hLayout = new QHBoxLayout;
@@ -42,28 +41,27 @@ void BubbleWidget::setupUI(const Packege& fullPkg)
     // 对齐控制：自己消息右对齐，他人左对齐
     if (isSelfMessage)
     {
-        hLayout->addStretch();      // 左侧弹簧
+        hLayout->addStretch(); // 左侧弹簧
         hLayout->addWidget(msgLabel);
     }
     else
     {
         hLayout->addWidget(msgLabel);
-        hLayout->addStretch();      // 右侧弹簧
+        hLayout->addStretch(); // 右侧弹簧
     }
 
     // 设置文本浏览器不自动打开链接
     msgLabel->setOpenExternalLinks(false);
     // 连接锚点点击信号
-    connect(msgLabel, &QLabel::linkActivated,this,[this](const QString& link){
-        handleAnchorClicked(QUrl(link));
-    });
+    connect(msgLabel, &QLabel::linkActivated, this, [this](const QString &link)
+            { handleAnchorClicked(QUrl(link)); });
 
     this->setLayout(hLayout);
 }
 
-QString BubbleWidget::generateTextMessageHtml(const Packege& fullPkg)
+QString BubbleWidget::generateTextMessageHtml(const Packege &fullPkg)
 {
-    bool isSelfMessage=fullPkg.sender==qApp->property("username").toString();
+    bool isSelfMessage = fullPkg.sender == qApp->property("username").toString();
     QString richText = fullPkg.messageInfo.richText;
     QString escapedText = richText
                               // 清理完整的HTML文档标签
@@ -85,19 +83,23 @@ QString BubbleWidget::generateTextMessageHtml(const Packege& fullPkg)
     QRegularExpression imgRegex(R"(<img\s+([^>]*?)src\s*=\s*['"]([^'"]+)['"]([^>]*?)/?>)");
     QRegularExpressionMatchIterator it = imgRegex.globalMatch(escapedText);
     int offset = 0;
-    while (it.hasNext()) {
+    while (it.hasNext())
+    {
         QRegularExpressionMatch match = it.next();
         QString src = match.captured(2);
         QString attrs = match.captured(1) + match.captured(3);
         QString replacement;
 
-        if (src.startsWith(":/resource/image/emojis/")) {
+        if (src.startsWith(":/resource/image/emojis/"))
+        {
             // 表情包：用 span 包裹保持内联
             replacement = QString("<span style=\"display: inline;\">"
                                   "<img src=\"%1\" %2 style=\"display: inline; vertical-align: middle; max-width: 32px; max-height: 32px;\"/>"
                                   "</span>")
                               .arg(src, attrs);
-        } else {
+        }
+        else
+        {
             // 普通图片：单独一行
             replacement = QString("<div style='display: block; margin: 5px 0;'>"
                                   "<img src=\"%1\" %2 width=\"400\" height=\"366\"/></div>")
@@ -128,21 +130,21 @@ QString BubbleWidget::generateTextMessageHtml(const Packege& fullPkg)
     // 在连续字符中插入零宽空格（每20字符）
     escapedText.replace(
         QRegularExpression(R"((\d{20}|\w{20}))"),
-        "\\1&#8203;"  // Unicode Zero-Width Space
-        );
+        "\\1&#8203;" // Unicode Zero-Width Space
+    );
 
     // ===== 文本气泡设置 =====
     return QString(
                "<div style='"
-               "display: inline-block;"        // 让 div 根据内容自适应
-               "background: %1;"               // 背景色(自己消息绿色，他人消息白色)
-               "border-radius: 8px;"           // 圆角
-               "padding: 8px 12px;"            // 四周内边距
+               "display: inline-block;" // 让 div 根据内容自适应
+               "background: %1;"        // 背景色(自己消息绿色，他人消息白色)
+               "border-radius: 8px;"    // 圆角
+               "padding: 8px 12px;"     // 四周内边距
                "'>"
-               "%2"                            // 消息内容
-               "</div>"
-               ).arg(isSelfMessage ? "#DCF8C6" : "#63A9E6")  // %1
-                .arg(escapedText);             // %2
+               "%2" // 消息内容
+               "</div>")
+        .arg(isSelfMessage ? "#DCF8C6" : "#63A9E6") // %1
+        .arg(escapedText);                          // %2
 
     // =======================
 }
@@ -150,12 +152,12 @@ QString BubbleWidget::generateTextMessageHtml(const Packege& fullPkg)
 QString BubbleWidget::generateFileMessageHtml(const Packege &fullPkg)
 {
     // ===== 文件气泡设置 =====
-    QString fileID=fullPkg.messageInfo.file.fileID;
-    QString fileName=fullPkg.messageInfo.file.fileName;
-    QString fileType=fullPkg.messageInfo.file.fileType;
-    QString fileSize=QString::number(fullPkg.messageInfo.file.fileSize/1024)+" KB";
+    QString fileID = fullPkg.messageInfo.file.fileID;
+    QString fileName = fullPkg.messageInfo.file.fileName;
+    QString fileType = fullPkg.messageInfo.file.fileType;
+    QString fileSize = QString::number(fullPkg.messageInfo.file.fileSize / 1024) + " KB";
 
-    QString sendHtml=
+    QString sendHtml =
         QString(
             "<div style='margin:5px; clear:both; max-width:70%;'>"
             "  <div style='padding:8px; border-radius:8px;'>"
@@ -172,13 +174,13 @@ QString BubbleWidget::generateFileMessageHtml(const Packege &fullPkg)
             "      </tr>"
             "    </table>"
             "  </div>"
-            "</div>"
-            ).arg(fileType, fileName.toHtmlEscaped(), fileSize);
+            "</div>")
+            .arg(fileType, fileName.toHtmlEscaped(), fileSize);
 
     /*=====================标准 URL 格式为：scheme://host/path?query#fragment=================================*
-    *======================自定义协议的特殊情况:scheme:///path，即%6============================================*/
+     *======================自定义协议的特殊情况:scheme:///path，即%6============================================*/
     // 使用标准锚点
-    QString receiverHtml=
+    QString receiverHtml =
         QString(
             "<div style='margin:5px; clear:both; max-width:70%;'>"
             "  <div style='padding:8px; border-radius:8px;'>"
@@ -196,11 +198,11 @@ QString BubbleWidget::generateFileMessageHtml(const Packege &fullPkg)
             "      </tr>"
             "    </table>"
             "  </div>"
-            "</div>"
-            ).arg(fileType, fileName, fileSize, fileID);
+            "</div>")
+            .arg(fileType, fileName, fileSize, fileID);
 
-    bool isSelfMessage=fullPkg.sender==qApp->property("username").toString();
-    return isSelfMessage?sendHtml:receiverHtml;
+    bool isSelfMessage = fullPkg.sender == qApp->property("username").toString();
+    return isSelfMessage ? sendHtml : receiverHtml;
     // =======================
 }
 
@@ -221,5 +223,3 @@ void BubbleWidget::handleAnchorClicked(const QUrl &url)
         emit openFolderRequested(fileID);
     }
 }
-
-

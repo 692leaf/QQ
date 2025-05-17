@@ -23,11 +23,11 @@ void EmojiManager::setupUI()
     // 创建承载表情按钮的内部容器
     QWidget *contentWidget = new QWidget;
     QVBoxLayout *mainLayout = new QVBoxLayout(contentWidget); // 布局绑定到 contentWidget
-    mainLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft); // 顶部对齐
+    mainLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);   // 顶部对齐
 
     // --- 动态获取表情路径 ---
     QStringList emojiPaths;
-    QDirIterator it(":/resource/image/emojis",  // 资源路径
+    QDirIterator it(":/resource/image/emojis", // 资源路径
                     QDir::Files);
     while (it.hasNext())
     {
@@ -35,17 +35,17 @@ void EmojiManager::setupUI()
     }
 
     // 每行10个按钮
-    const int BUTTONS_PER_ROW = 10; // 改为每行10个
+    const int BUTTONS_PER_ROW = 10;  // 改为每行10个
     const QSize BUTTON_SIZE(40, 40); // 固定按钮尺寸
 
     for (int rowIndex = 0; rowIndex < emojiPaths.size(); rowIndex += BUTTONS_PER_ROW) // 每次步进 5
     {
-        QHBoxLayout* rowLayout = new QHBoxLayout;
+        QHBoxLayout *rowLayout = new QHBoxLayout;
         rowLayout->setAlignment(Qt::AlignLeft); // 行内左对齐
-        rowLayout->setSpacing(0); // 按钮间距为0
-        for(int colIndex =rowIndex;colIndex <rowIndex+BUTTONS_PER_ROW  && colIndex <emojiPaths.size();++colIndex )
+        rowLayout->setSpacing(0);               // 按钮间距为0
+        for (int colIndex = rowIndex; colIndex < rowIndex + BUTTONS_PER_ROW && colIndex < emojiPaths.size(); ++colIndex)
         {
-            QPushButton* button = new QPushButton(this);
+            QPushButton *button = new QPushButton(this);
 
             // 设置图标
             QString emojiPath = emojiPaths[colIndex];
@@ -55,16 +55,16 @@ void EmojiManager::setupUI()
             QFileInfo fileInfo(emojiPath);
             QString displayName = fileInfo.fileName();
             displayName.replace(QRegularExpression("\\.\\w+$"), ""); // 正则匹配后缀
-            button->setToolTip(displayName);  // 设置工具提示
+            button->setToolTip(displayName);                         // 设置工具提示
 
             // 设置按钮属性
-            button->setIconSize(BUTTON_SIZE - QSize(8,8)); // 图标略小于按钮
-            button->setFixedSize(BUTTON_SIZE); // 固定按钮尺寸
-            button->setFlat(true); // 去掉按钮边框
-            connect(button, &QPushButton::clicked,[this, emojiPath](){
+            button->setIconSize(BUTTON_SIZE - QSize(8, 8)); // 图标略小于按钮
+            button->setFixedSize(BUTTON_SIZE);              // 固定按钮尺寸
+            button->setFlat(true);                          // 去掉按钮边框
+            connect(button, &QPushButton::clicked, [this, emojiPath]()
+                    {
                 // 处理表情点击事件
-                emit emojiClicked(emojiPath);
-            });
+                emit emojiClicked(emojiPath); });
             rowLayout->addWidget(button);
         }
         mainLayout->addLayout(rowLayout);

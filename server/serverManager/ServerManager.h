@@ -18,12 +18,12 @@ public:
     bool init();
     void cleanup();
 private slots:
-    void onQuitRequested();        // 退出程序请求
+    void onQuitRequested(); // 退出程序请求
 
 private:
-    ServerTray* serverTray;      // 系统托盘
-    DatabaseManager* dbManager;  // 数据库
-    TcpServer* server;           // 网络通讯
+    ServerTray *serverTray;     // 系统托盘
+    DatabaseManager *dbManager; // 数据库
+    TcpServer *server;          // 网络通讯
 };
 
 #endif // SERVERMANAGER_H

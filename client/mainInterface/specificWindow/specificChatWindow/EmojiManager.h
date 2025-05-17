@@ -10,7 +10,7 @@ public:
     explicit EmojiManager(QWidget *parent = nullptr);
     void setupUI();
 signals:
-    void emojiClicked(const QString& emojiPath);
+    void emojiClicked(const QString &emojiPath);
 };
 
 #endif // EMOJIMANAGER_H

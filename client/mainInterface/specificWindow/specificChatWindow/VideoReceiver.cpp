@@ -12,7 +12,6 @@ VideoReceiver::~VideoReceiver()
     delete udpSocket;
 }
 
-
 void VideoReceiver::startListening()
 {
     // 已开启监听
@@ -30,7 +29,7 @@ void VideoReceiver::startListening()
     {
         qDebug() << "绑定失败，错误信息:" << udpSocket->errorString();
     }
-    connect(udpSocket,&QUdpSocket::readyRead,this,&VideoReceiver::readPendingDatagrams);
+    connect(udpSocket, &QUdpSocket::readyRead, this, &VideoReceiver::readPendingDatagrams);
 }
 
 quint16 VideoReceiver::getLocalBindPort()
@@ -39,17 +38,17 @@ quint16 VideoReceiver::getLocalBindPort()
     return localListenPort;
 }
 
-
 void VideoReceiver::readPendingDatagrams()
 {
-    while(udpSocket->hasPendingDatagrams())
+    while (udpSocket->hasPendingDatagrams())
     {
         QByteArray datagram;
         datagram.resize(udpSocket->pendingDatagramSize());
         udpSocket->readDatagram(datagram.data(), datagram.size());
 
         // 检查数据有效性
-        if (datagram.isEmpty()) continue;
+        if (datagram.isEmpty())
+            continue;
 
         QImage image;
         if (image.loadFromData(datagram, "JPEG") && !image.isNull())
@@ -58,4 +57,3 @@ void VideoReceiver::readPendingDatagrams()
         }
     }
 }
-
